@@ -1,0 +1,292 @@
+import cors from "cors";
+import dotenv from "dotenv";
+import express from "express";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import { z } from "zod";
+import { SellAuthError, shopPath, sellauthRequest, type SellAuthMethod } from "./sellauth.js";
+
+dotenv.config();
+
+const app = express();
+const port = Number(process.env.PORT || process.env.SERVER_PORT || 8787);
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const publicDir = path.resolve(__dirname, "../dist");
+const checkoutSchema = z.object({
+  productId: z.union([z.number(), z.string()]),
+  variantId: z.union([z.number(), z.string()]),
+  quantity: z.number().int().min(1).max(100).default(1),
+  email: z.string().email().optional(),
+  coupon: z.string().min(1).optional(),
+  gateway: z.string().min(1).optional()
+});
+
+type SellAuthProduct = {
+  id?: number | string;
+  path?: string;
+  status_text?: string;
+  status_color?: string;
+  description?: string;
+  instructions?: string;
+};
+
+type SellAuthShop = {
+  url?: string;
+};
+
+function getErrorMessage(payload: unknown) {
+  if (payload && typeof payload === "object") {
+    const record = payload as { error?: unknown; message?: unknown };
+    return String(record.message || record.error || "");
+  }
+
+  return String(payload || "");
+}
+
+async function getHostedProductUrl(productId: string | number) {
+  const [shop, product] = await Promise.all([
+    sellauthRequest<SellAuthShop>(shopPath()),
+    sellauthRequest<SellAuthProduct>(shopPath(`products/${productId}`))
+  ]);
+
+  if (!shop.url || !product.path) {
+    return undefined;
+  }
+
+  return `${shop.url.replace(/\/$/, "")}/product/${product.path}`;
+}
+
+function getPayloadProducts(payload: unknown) {
+  if (Array.isArray(payload)) {
+    return payload as SellAuthProduct[];
+  }
+
+  if (payload && typeof payload === "object") {
+    const record = payload as {
+      data?: SellAuthProduct[];
+      products?: SellAuthProduct[];
+    };
+
+    return record.data || record.products || [];
+  }
+
+  return [];
+}
+
+async function enrichProductStatuses(payload: unknown) {
+  const products = getPayloadProducts(payload);
+
+  await Promise.all(
+    products.map(async (product) => {
+      if (!product.id) {
+        return;
+      }
+
+      try {
+        const details = await sellauthRequest<SellAuthProduct>(
+          shopPath(`products/${product.id}`)
+        );
+
+        product.status_text = details.status_text || product.status_text;
+        product.status_color = details.status_color || product.status_color;
+        product.description = details.description || product.description;
+        product.instructions = details.instructions || product.instructions;
+      } catch {
+        // Keep the list usable if one detail lookup fails.
+      }
+    })
+  );
+
+  return payload;
+}
+
+app.use(cors({ origin: process.env.CORS_ORIGIN || true }));
+app.use(express.json({ limit: "1mb" }));
+
+app.get("/api/health", (_request, response) => {
+  response.json({
+    ok: true,
+    service: "ILCFRONTEND",
+    sellauthConfigured: Boolean(
+      process.env.SELLAUTH_API_KEY && process.env.SELLAUTH_SHOP_ID
+    )
+  });
+});
+
+app.get("/api/storefront/products", async (request, response, next) => {
+  try {
+    const query = new URLSearchParams();
+    query.set("perPage", String(request.query.perPage || 24));
+    query.set("page", String(request.query.page || 1));
+    query.set("orderColumn", String(request.query.orderColumn || "products_sold"));
+    query.set("orderDirection", String(request.query.orderDirection || "desc"));
+
+    const payload = await sellauthRequest(shopPath("products"), { query });
+    response.json(await enrichProductStatuses(payload));
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.get("/api/storefront/products/:productId", async (request, response, next) => {
+  try {
+    const payload = await sellauthRequest(
+      shopPath(`products/${request.params.productId}`)
+    );
+    response.json(payload);
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.get("/api/storefront/products/:productId/status", async (request, response, next) => {
+  try {
+    const product = await sellauthRequest<{
+      status_text?: string;
+      status_color?: string;
+      stock?: number;
+    }>(shopPath(`products/${request.params.productId}`));
+
+    response.json({
+      statusText: product.status_text || "Live",
+      statusColor: product.status_color || "#21d66b",
+      stock: product.stock
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.post("/api/storefront/checkout", async (request, response, next) => {
+  try {
+    const checkout = checkoutSchema.parse(request.body);
+    const forwardedFor = request.headers["x-forwarded-for"];
+    const ip = Array.isArray(forwardedFor)
+      ? forwardedFor[0]
+      : forwardedFor?.split(",")[0]?.trim() || request.ip;
+    const safeIp = ip === "::1" || ip === "127.0.0.1" ? "1.1.1.1" : ip;
+
+    let payload: {
+      success?: boolean;
+      invoice_id?: number;
+      invoice_url?: string;
+      url?: string;
+      hosted_url?: string;
+      checkout_api_unavailable?: boolean;
+    };
+
+    try {
+      payload = await sellauthRequest(shopPath("checkout"), {
+        method: "POST",
+        body: {
+          cart: [
+            {
+              productId: checkout.productId,
+              variantId: checkout.variantId,
+              quantity: checkout.quantity
+            }
+          ],
+          ip: safeIp,
+          country_code: "US",
+          user_agent: request.get("user-agent") || "Mozilla/5.0",
+          email: checkout.email,
+          coupon: checkout.coupon,
+          gateway: checkout.gateway,
+          newsletter: false
+        }
+      });
+    } catch (error) {
+      if (
+        error instanceof SellAuthError &&
+        getErrorMessage(error.payload).toLowerCase().includes("checkout api")
+      ) {
+        const hostedUrl = await getHostedProductUrl(checkout.productId);
+
+        if (hostedUrl) {
+          response.json({
+            success: true,
+            hosted_url: hostedUrl,
+            checkout_api_unavailable: true
+          });
+          return;
+        }
+      }
+
+      throw error;
+    }
+
+    response.json(payload);
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.all("/api/sellauth/*path", async (request, response, next) => {
+  if (process.env.SELLAUTH_PROXY_ENABLED !== "true") {
+    response.status(404).json({ error: "Not found" });
+    return;
+  }
+
+  try {
+    const rawPath = Array.isArray(request.params.path)
+      ? request.params.path.join("/")
+      : request.params.path;
+    const query = new URLSearchParams();
+
+    Object.entries(request.query).forEach(([key, value]) => {
+      if (Array.isArray(value)) {
+        value.forEach((item) => query.append(key, String(item)));
+      } else if (value !== undefined) {
+        query.append(key, String(value));
+      }
+    });
+
+    const payload = await sellauthRequest(rawPath, {
+      method: request.method as SellAuthMethod,
+      query,
+      body: ["GET", "HEAD"].includes(request.method) ? undefined : request.body
+    });
+
+    response.json(payload);
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.use(express.static(publicDir));
+
+app.use((_request, response) => {
+  response.sendFile(path.join(publicDir, "index.html"));
+});
+
+app.use(
+  (
+    error: unknown,
+    _request: express.Request,
+    response: express.Response,
+    _next: express.NextFunction
+  ) => {
+    if (error instanceof SellAuthError) {
+      response.status(error.status).json({
+        error: "SellAuth request failed",
+        ...(process.env.DEBUG_SELLAUTH_ERRORS === "true" ? { details: error.payload } : {})
+      });
+      return;
+    }
+
+    if (error instanceof Error && error.name === "ZodError") {
+      response.status(500).json({
+        error: "SellAuth environment variables are missing or invalid"
+      });
+      return;
+    }
+
+    console.error(error);
+    response.status(500).json({ error: "Unexpected server error" });
+  }
+);
+
+app.listen(port, "0.0.0.0", () => {
+  console.log(`ILCFRONTEND listening on http://localhost:${port}`);
+});

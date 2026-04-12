@@ -1,0 +1,4 @@
+
+> ilcfrontend@0.1.0 dev
+> concurrently "npm:dev:client" "npm:dev:server"
+

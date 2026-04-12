@@ -1,0 +1,33 @@
+
+> ilcfrontend@0.1.0 dev
+> concurrently "npm:dev:client" "npm:dev:server"
+
+[dev:client] 
+[dev:client] > ilcfrontend@0.1.0 dev:client
+[dev:client] > vite --host 0.0.0.0
+[dev:client] 
+[dev:server] 
+[dev:server] > ilcfrontend@0.1.0 dev:server
+[dev:server] > tsx watch server/index.ts
+[dev:server] 
+[dev:client] 
+[dev:client]   [32m[1mVITE[22m v7.3.2[39m  [2mready in [0m[1m300[22m[2m[0m ms[22m
+[dev:client] 
+[dev:client]   [32m➜[39m  [1mLocal[22m:   [36mhttp://localhost:[1m5173[22m/[39m
+[dev:client]   [32m➜[39m  [1mNetwork[22m: [36mhttp://192.168.178.42:[1m5173[22m/[39m
+[dev:server] ◇ injected env (7) from .env // tip: ◈ encrypted .env [www.dotenvx.com]
+[dev:server] ILCFRONTEND listening on http://localhost:8787
+[dev:client] [2m05:02:11[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/App.tsx[22m
+[dev:client] [2m05:02:24[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/App.tsx[22m
+[dev:client] [2m05:02:31[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles.css[22m
+[dev:client] [2m05:02:44[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/App.tsx[22m
+[dev:client] [2m05:03:15[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/App.tsx[22m
+[dev:server] 05:08:18 [tsx] change in ./server\index.ts Restarting...
+[dev:server] c◇ injected env (7) from .env // tip: ⌁ auth for agents [www.vestauth.com]
+[dev:server] ILCFRONTEND listening on http://localhost:8787
+[dev:client] [2m05:08:30[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/App.tsx[22m
+[dev:client] [2m05:08:35[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/App.tsx[22m
+[dev:client] [2m05:08:40[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/App.tsx[22m
+[dev:client] [2m05:08:44[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/App.tsx[22m
+[dev:client] [2m05:08:52[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/App.tsx[22m
+[dev:client] [2m05:09:00[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles.css[22m

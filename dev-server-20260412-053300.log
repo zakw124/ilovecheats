@@ -1,0 +1,29 @@
+
+> ilcfrontend@0.1.0 dev
+> concurrently "npm:dev:client" "npm:dev:server"
+
+[dev:client] 
+[dev:client] > ilcfrontend@0.1.0 dev:client
+[dev:client] > vite --host 0.0.0.0
+[dev:client] 
+[dev:server] 
+[dev:server] > ilcfrontend@0.1.0 dev:server
+[dev:server] > tsx watch server/index.ts
+[dev:server] 
+[dev:client] 
+[dev:client]   [32m[1mVITE[22m v7.3.2[39m  [2mready in [0m[1m327[22m[2m[0m ms[22m
+[dev:client] 
+[dev:client]   [32m➜[39m  [1mLocal[22m:   [36mhttp://localhost:[1m5173[22m/[39m
+[dev:client]   [32m➜[39m  [1mNetwork[22m: [36mhttp://192.168.178.42:[1m5173[22m/[39m
+[dev:server] ◇ injected env (7) from .env // tip: ◈ encrypted .env [www.dotenvx.com]
+[dev:server] ILCFRONTEND listening on http://localhost:8787
+[dev:client] [2m05:44:14[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/App.tsx[22m
+[dev:client] [2m05:44:25[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/App.tsx[22m
+[dev:client] [2m05:44:38[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/App.tsx[22m
+[dev:client] [2m05:44:51[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/App.tsx[22m
+[dev:client] [2m05:45:10[22m [36m[1m[vite][22m[39m [32m.env changed, restarting server...[39m
+[dev:client] [2m05:45:10[22m [36m[1m[vite][22m[39m server restarted.
+[dev:client] [2m05:49:17[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/App.tsx[22m
+[dev:client] [2m05:49:23[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/App.tsx[22m
+[dev:client] [2m05:49:32[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/App.tsx[22m
+[dev:client] [2m05:49:39[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/App.tsx[22m

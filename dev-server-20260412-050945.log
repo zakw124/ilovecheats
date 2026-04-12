@@ -1,0 +1,37 @@
+
+> ilcfrontend@0.1.0 dev
+> concurrently "npm:dev:client" "npm:dev:server"
+
+[dev:client] 
+[dev:client] > ilcfrontend@0.1.0 dev:client
+[dev:client] > vite --host 0.0.0.0
+[dev:client] 
+[dev:server] 
+[dev:server] > ilcfrontend@0.1.0 dev:server
+[dev:server] > tsx watch server/index.ts
+[dev:server] 
+[dev:client] 
+[dev:client]   [32m[1mVITE[22m v7.3.2[39m  [2mready in [0m[1m317[22m[2m[0m ms[22m
+[dev:client] 
+[dev:client]   [32m➜[39m  [1mLocal[22m:   [36mhttp://localhost:[1m5173[22m/[39m
+[dev:client]   [32m➜[39m  [1mNetwork[22m: [36mhttp://192.168.178.42:[1m5173[22m/[39m
+[dev:server] ◇ injected env (7) from .env // tip: ⌘ custom filepath { path: '/custom/path/.env' }
+[dev:server] ILCFRONTEND listening on http://localhost:8787
+[dev:client] [2m05:13:09[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/App.tsx[22m
+[dev:client] [2m05:13:29[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles.css[22m
+[dev:client] [2m05:13:32[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles.css[22m
+[dev:client] [2m05:13:35[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles.css[22m
+[dev:client] [2m05:13:45[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles.css[22m
+[dev:client] [2m05:19:41[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/App.tsx[22m
+[dev:client] [2m05:19:50[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles.css[22m
+[dev:client] [2m05:23:07[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/App.tsx[22m
+[dev:client] [2m05:23:12[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/styles.css[22m
+[dev:client] [2m05:31:12[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/App.tsx[22m
+[dev:client] [2m05:31:43[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/App.tsx[22m
+[dev:client] [2m05:31:50[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/App.tsx[22m
+[dev:server] 05:31:59 [tsx] change in ./server\index.ts Restarting...
+[dev:server] c◇ injected env (7) from .env // tip: ◈ encrypted .env [www.dotenvx.com]
+[dev:server] ILCFRONTEND listening on http://localhost:8787
+[dev:server] 05:32:13 [tsx] change in ./server\index.ts Restarting...
+[dev:server] c◇ injected env (7) from .env // tip: ⌘ suppress logs { quiet: true }
+[dev:server] ILCFRONTEND listening on http://localhost:8787
