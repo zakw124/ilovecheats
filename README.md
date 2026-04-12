@@ -6,7 +6,7 @@ Dark ecommerce storefront for trendy tech product keys, backed by a private Sell
 
 - React + Vite storefront with a dark red/pink product-key theme.
 - Home, full store, status, product detail, and checkout review pages.
-- Discord community section with a styled placeholder or real widget embed.
+- Discord community section that can show the latest messages from a real channel.
 - Express server that serves the production frontend and proxies SellAuth API calls.
 - Private SellAuth credentials through `.env`, never exposed in browser code.
 - Railway config using Nixpacks.
@@ -66,11 +66,15 @@ http://localhost:5173/product/windows-11-pro
 http://localhost:5173/checkout/windows-11-pro?variant=1-week
 ```
 
-For the Discord section, either keep the styled placeholder or add a real widget URL to `.env`:
+For the Discord section, add a bot token and channel ID to `.env` so the site can show recent channel messages:
 
 ```env
-VITE_DISCORD_WIDGET_URL=https://discord.com/widget?id=YOUR_SERVER_ID&theme=dark
+VITE_DISCORD_INVITE_URL=https://discord.gg/YOUR_INVITE
+DISCORD_BOT_TOKEN=your_discord_bot_token
+DISCORD_CHANNEL_ID=your_channel_id
 ```
+
+The bot must be in the server and able to read that channel's message history.
 
 ## SellAuth API Access
 
@@ -111,7 +115,9 @@ Leave it disabled for public storefront deployments. The storefront routes above
    VITE_SELLAUTH_SHOP_ID=your_real_shop_id
    VITE_STORE_NAME=ILC Keys
    VITE_SUPPORT_EMAIL=support@example.com
-   VITE_DISCORD_WIDGET_URL=https://discord.com/widget?id=YOUR_SERVER_ID&theme=dark
+   VITE_DISCORD_INVITE_URL=https://discord.gg/YOUR_INVITE
+   DISCORD_BOT_TOKEN=your_discord_bot_token
+   DISCORD_CHANNEL_ID=your_channel_id
    ```
 
 4. Railway will run:

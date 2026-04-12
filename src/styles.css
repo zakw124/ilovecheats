@@ -42,6 +42,48 @@
   }
 }
 
+@keyframes live-pulse {
+  70% {
+    box-shadow: 0 0 0 0.6rem rgba(69, 230, 160, 0);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgba(69, 230, 160, 0);
+  }
+}
+
+@keyframes soft-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes selected-breathe {
+  50% {
+    box-shadow:
+      inset 0 0 0 1px rgba(255, 82, 119, 0.34),
+      0 0 22px rgba(255, 82, 119, 0.12);
+  }
+}
+
+@keyframes js-ripple-animation {
+  0% {
+    opacity: 0.34;
+    transform: scale(0);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(1);
+  }
+}
+
 * {
   box-sizing: border-box;
 }
@@ -78,6 +120,26 @@ a {
 
 button {
   font: inherit;
+}
+
+.ripple-target {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.ripple-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.ripple-wave {
+  position: absolute;
+  border-radius: 50%;
+  animation: js-ripple-animation var(--ripple-duration, 600ms) ease-out forwards;
 }
 
 img {
@@ -123,8 +185,16 @@ img {
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
   gap: 1rem;
-  padding: 1.8rem clamp(1rem, 3.4vw, 2.4rem);
-  background: rgba(8, 8, 10, 0.76);
+  padding: 1.05rem clamp(1rem, 3.4vw, 2.4rem);
+  border-bottom: 1px solid;
+  border-image: linear-gradient(
+      90deg,
+      rgba(255, 82, 119, 0.66),
+      rgba(69, 230, 160, 0.28),
+      rgba(85, 160, 255, 0.5)
+    )
+    1;
+  background: rgba(8, 8, 10, 0.8);
   backdrop-filter: blur(18px);
 }
 
@@ -133,7 +203,6 @@ nav,
 .hero-actions,
 .product-footer,
 .product-meta,
-footer,
 .store-pill,
 .platform-line,
 .purchase-actions,
@@ -149,8 +218,8 @@ footer,
 }
 
 .brand-mark {
-  width: 2.25rem;
-  height: 2.25rem;
+  width: 1.95rem;
+  height: 1.95rem;
   object-fit: contain;
 }
 
@@ -167,20 +236,39 @@ nav a:hover {
 
 .store-pill {
   position: relative;
+  overflow: hidden;
   justify-self: end;
   gap: 0.55rem;
-  min-height: 2.1rem;
-  padding: 0.5rem 1.05rem;
-  border: 1px solid rgba(255, 255, 255, 0.24);
-  border-radius: 999px;
-  background: linear-gradient(#ffffff, #cfcfd2);
-  color: #0a0a0c;
-  box-shadow: 0 9px 24px rgba(0, 0, 0, 0.32);
+  min-height: 2.65rem;
+  padding: 0.68rem 1.15rem;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, rgba(18, 18, 20, 0.98), rgba(37, 18, 29, 0.96)) padding-box,
+    linear-gradient(
+        90deg,
+        #ff5277,
+        #ffd65a,
+        #45e6a0,
+        #55a0ff,
+        #b25eff,
+        #ff5277
+      )
+      border-box;
+  background-size:
+    auto,
+    200% 100%;
+  color: #fff;
+  box-shadow:
+    0 0 15px rgba(255, 82, 119, 0.18),
+    0 10px 24px rgba(0, 0, 0, 0.32);
+  animation: rainbow-slide 10s linear infinite;
 }
 
 .primary-button,
 .secondary-button,
 .discord-button,
+.rainbow-button,
 .featured-price a,
 .product-footer a,
 .buy-button,
@@ -188,7 +276,7 @@ nav a:hover {
 .store-pill,
 .coupon-row button,
 .process-button,
-.discord-bottom button {
+.discord-bottom a {
   transition:
     transform 180ms ease,
     box-shadow 180ms ease,
@@ -199,6 +287,7 @@ nav a:hover {
 .primary-button:hover,
 .secondary-button:hover,
 .discord-button:hover,
+.rainbow-button:hover,
 .featured-price a:hover,
 .product-footer a:hover,
 .buy-button:hover,
@@ -206,7 +295,7 @@ nav a:hover {
 .store-pill:hover,
 .coupon-row button:hover,
 .process-button:not(:disabled):hover,
-.discord-bottom button:hover {
+.discord-bottom a:hover {
   transform: translateY(-2px);
   filter: brightness(1.08);
   box-shadow: 0 18px 42px rgba(255, 82, 119, 0.3);
@@ -215,6 +304,7 @@ nav a:hover {
 .primary-button:active,
 .secondary-button:active,
 .discord-button:active,
+.rainbow-button:active,
 .featured-price a:active,
 .product-footer a:active,
 .buy-button:active,
@@ -222,23 +312,9 @@ nav a:hover {
 .store-pill:active,
 .coupon-row button:active,
 .process-button:not(:disabled):active,
-.discord-bottom button:active {
+.discord-bottom a:active {
   transform: translateY(1px) scale(0.985);
   filter: brightness(0.96);
-}
-
-.cart-count {
-  position: absolute;
-  top: -0.7rem;
-  left: -0.35rem;
-  display: grid;
-  width: 1.15rem;
-  height: 1.15rem;
-  place-items: center;
-  border-radius: 50%;
-  background: var(--accent);
-  color: #fff;
-  font-size: 0.72rem;
 }
 
 .hero {
@@ -249,7 +325,7 @@ nav a:hover {
   align-items: start;
   gap: clamp(1rem, 3vw, 3.5rem);
   overflow: hidden;
-  padding: 7rem clamp(1rem, 4vw, 4.5rem) 6rem;
+  padding: 7rem clamp(1rem, 4vw, 4.5rem) 6rem clamp(2.2rem, 7vw, 7rem);
   background: #050507;
 }
 
@@ -281,7 +357,7 @@ nav a:hover {
   width: min(100%, 58rem);
   align-self: start;
   padding-top: clamp(2rem, 8vh, 5rem);
-  margin-left: clamp(0.8rem, 2vw, 2.2rem);
+  margin-left: clamp(1rem, 3vw, 3rem);
 }
 
 .hero-model-panel {
@@ -349,36 +425,11 @@ nav a:hover {
   transform: translateY(1px) scale(0.98);
 }
 
-.model-toggle span {
-  position: relative;
-  width: 1rem;
-  height: 1.22rem;
-  border: 2px solid currentColor;
-  border-bottom: 0;
-  border-radius: 999px 999px 0 0;
-}
-
-.model-toggle span::before {
-  content: "";
-  position: absolute;
-  left: 0.1rem;
-  right: 0.1rem;
-  bottom: -0.32rem;
-  height: 0.34rem;
-  border-radius: 0 0 4px 4px;
-  background: currentColor;
-}
-
-.model-toggle span::after {
-  content: "";
-  position: absolute;
-  left: 50%;
-  bottom: -0.58rem;
-  width: 0.48rem;
-  height: 0.12rem;
-  border-radius: 999px;
-  background: currentColor;
-  transform: translateX(-50%);
+.model-toggle svg {
+  width: 1.18rem;
+  height: 1.18rem;
+  stroke-width: 2;
+  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.24));
 }
 
 .eyebrow {
@@ -411,6 +462,7 @@ nav,
 .primary-button,
 .secondary-button,
 .discord-button,
+.rainbow-button,
 .featured-price a,
 .product-footer a,
 .buy-button,
@@ -453,15 +505,40 @@ h1 {
 
 .primary-button,
 .secondary-button,
-.discord-button {
+.discord-button,
+.rainbow-button {
   padding: 0.9rem 1.15rem;
 }
 
-.primary-button,
-.discord-button {
+.primary-button {
   background: linear-gradient(135deg, var(--accent), var(--accent-strong));
   color: #fff;
   box-shadow: 0 18px 36px rgba(255, 39, 92, 0.24);
+}
+
+.discord-button,
+.rainbow-button {
+  border: 1px solid transparent;
+  background:
+    linear-gradient(135deg, rgba(18, 18, 20, 0.98), rgba(37, 18, 29, 0.98)) padding-box,
+    linear-gradient(
+        90deg,
+        #ff5277,
+        #ffd65a,
+        #45e6a0,
+        #55a0ff,
+        #b25eff,
+        #ff5277
+      )
+      border-box;
+  background-size:
+    auto,
+    200% 100%;
+  color: #fff;
+  box-shadow:
+    0 0 20px rgba(255, 82, 119, 0.24),
+    0 0 32px rgba(85, 160, 255, 0.14);
+  animation: rainbow-slide 8s linear infinite;
 }
 
 .product-footer a,
@@ -470,6 +547,27 @@ h1 {
   background: linear-gradient(135deg, #38bdf8, #2563eb);
   color: #fff;
   box-shadow: 0 18px 38px rgba(37, 99, 235, 0.28);
+}
+
+.product-footer a.rainbow-button {
+  background:
+    linear-gradient(135deg, rgba(18, 18, 20, 0.98), rgba(37, 18, 29, 0.96)) padding-box,
+    linear-gradient(
+        90deg,
+        #ff5277,
+        #ffd65a,
+        #45e6a0,
+        #55a0ff,
+        #b25eff,
+        #ff5277
+      )
+      border-box;
+  background-size:
+    auto,
+    200% 100%;
+  box-shadow:
+    0 0 15px rgba(255, 82, 119, 0.18),
+    0 10px 24px rgba(0, 0, 0, 0.32);
 }
 
 .secondary-button {
@@ -502,8 +600,7 @@ h1 {
 .store-page,
 .product-page,
 .status-page,
-.checkout-page,
-footer {
+.checkout-page {
   padding-inline: clamp(1rem, 4vw, 4.5rem);
 }
 
@@ -532,7 +629,6 @@ footer {
 .section-heading p,
 .trust-band p,
 .product-body p,
-footer p,
 .store-heading p,
 .discord-copy p,
 .purchase-panel p,
@@ -697,40 +793,13 @@ footer p,
   padding: 1px;
   border: 1px solid transparent;
   border-radius: 8px;
-  background: transparent;
+  background:
+    linear-gradient(rgba(18, 18, 20, 0.97), rgba(18, 18, 20, 0.97)) padding-box,
+    linear-gradient(135deg, rgba(255, 82, 119, 0.42), rgba(85, 160, 255, 0.18)) border-box;
   transition:
     transform 220ms ease,
+    border-color 220ms ease,
     box-shadow 220ms ease;
-}
-
-.product-card::before,
-.product-card::after {
-  content: "";
-  position: absolute;
-  border-radius: inherit;
-}
-
-.product-card::before {
-  inset: -40%;
-  z-index: 0;
-  background: conic-gradient(
-    from 0deg,
-    rgba(255, 82, 119, 0.8),
-    rgba(255, 214, 90, 0.58),
-    rgba(69, 230, 160, 0.58),
-    rgba(85, 160, 255, 0.62),
-    rgba(178, 94, 255, 0.58),
-    rgba(255, 82, 119, 0.8)
-  );
-  animation: rainbow-spin 11s linear infinite;
-  opacity: 0.42;
-}
-
-.product-card::after {
-  inset: 1px;
-  z-index: 0;
-  border-radius: 7px;
-  background: rgba(18, 18, 20, 0.97);
 }
 
 .product-card > * {
@@ -740,12 +809,8 @@ footer p,
 
 .product-card:hover {
   transform: translateY(-5px);
+  border-color: rgba(255, 82, 119, 0.46);
   box-shadow: 0 22px 50px rgba(0, 0, 0, 0.38);
-}
-
-.product-card:hover::before {
-  animation-duration: 2.2s;
-  opacity: 0.82;
 }
 
 .product-card img {
@@ -758,8 +823,8 @@ footer p,
 
 .product-body {
   display: grid;
-  gap: 0.9rem;
-  padding: 1rem;
+  gap: 0.78rem;
+  padding: 0.95rem;
   border-radius: 0 0 7px 7px;
 }
 
@@ -772,7 +837,7 @@ footer p,
 }
 
 .product-card h3 {
-  min-height: 3.2rem;
+  min-height: 2.9rem;
   margin-bottom: 0;
   overflow-wrap: anywhere;
   font-size: 1.28rem;
@@ -780,7 +845,7 @@ footer p,
 }
 
 .product-body p {
-  min-height: 4.8rem;
+  min-height: 3.9rem;
   margin-bottom: 0;
   overflow-wrap: anywhere;
 }
@@ -897,26 +962,6 @@ footer p,
   display: inline-flex;
   align-items: center;
   gap: 0.6rem;
-  border: 1px solid transparent;
-  background:
-    linear-gradient(135deg, rgba(18, 18, 20, 0.98), rgba(37, 18, 29, 0.98)) padding-box,
-    linear-gradient(
-        90deg,
-        #ff5277,
-        #ffd65a,
-        #45e6a0,
-        #55a0ff,
-        #b25eff,
-        #ff5277
-      )
-      border-box;
-  background-size:
-    auto,
-    200% 100%;
-  box-shadow:
-    0 0 20px rgba(255, 82, 119, 0.24),
-    0 0 32px rgba(85, 160, 255, 0.14);
-  animation: rainbow-slide 8s linear infinite;
 }
 
 .discord-icon {
@@ -946,7 +991,9 @@ footer p,
   right: 0.36rem;
 }
 
-.discord-widget {
+.discord-chat {
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
   min-height: 500px;
   border-radius: 8px;
@@ -954,71 +1001,119 @@ footer p,
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.36);
 }
 
-.discord-widget iframe {
-  width: 100%;
-  height: 500px;
-  border: 0;
-}
-
-.discord-widget-top {
+.discord-chat-top {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   gap: 1rem;
   padding: 1.5rem 1.25rem;
   background: var(--accent);
 }
 
-.discord-widget-top strong {
+.discord-chat-top div {
+  display: grid;
+  gap: 0.22rem;
+}
+
+.discord-chat-top strong {
   font-size: 1.3rem;
 }
 
-.discord-widget-top span,
-.discord-list-label,
+.discord-chat-top span,
 .discord-bottom {
   font-size: 0.85rem;
 }
 
-.discord-server-name {
-  padding: 1.25rem 1.25rem 0.9rem;
-  color: #fff;
+.discord-live-dot {
+  width: 0.82rem;
+  height: 0.82rem;
+  border-radius: 50%;
+  background: #45e6a0;
+  box-shadow: 0 0 0 0 rgba(69, 230, 160, 0.42);
+  animation: live-pulse 1.8s ease-out infinite;
 }
 
-.discord-list-label {
-  padding: 0.9rem 1.25rem;
-  color: #aeb4c2;
-}
-
-.discord-member {
+.discord-message-list {
   display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.8rem;
+  padding: 1rem;
+}
+
+.discord-message {
+  display: grid;
+  grid-template-columns: 2rem minmax(0, 1fr);
+  gap: 0.7rem;
+  align-items: start;
+  min-height: 4rem;
+  padding: 0.72rem;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.discord-message img {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+}
+
+.discord-message-meta {
+  display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 0.55rem;
-  padding: 0.22rem 1.25rem;
-  color: #b9beca;
+  gap: 0.4rem;
+}
+
+.discord-message-meta strong {
+  color: #fff;
   font-size: 0.9rem;
 }
 
-.discord-member span {
-  width: 0.7rem;
-  height: 0.7rem;
-  border-radius: 50%;
+.discord-message-meta span {
+  border-radius: 4px;
+  padding: 0.1rem 0.28rem;
+  background: rgba(255, 82, 119, 0.18);
+  color: var(--accent);
+  font-size: 0.62rem;
+  font-weight: 850;
+}
+
+.discord-message p,
+.discord-empty {
+  margin: 0;
+  color: #c6cad4;
+  font-size: 0.88rem;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.discord-empty {
+  display: grid;
+  flex: 1;
+  place-items: center;
+  min-height: 18rem;
+  text-align: center;
 }
 
 .discord-bottom {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   gap: 0.8rem;
-  margin-top: 0.7rem;
   padding: 0.6rem 0.45rem 0.6rem 1.25rem;
   background: #24252b;
   color: #8e929b;
 }
 
-.discord-bottom button {
+.discord-bottom a {
   border: 0;
   border-radius: 4px;
   padding: 0.45rem 1.1rem;
   background: #3b3d45;
   color: #fff;
+  text-decoration: none;
 }
 
 .trust-band {
@@ -1052,13 +1147,17 @@ footer p,
   padding-top: 3rem;
 }
 
-.store-flow-field {
+.store-flow-field,
+.store-bloodline {
   position: fixed;
   inset: 0;
   z-index: 0;
   width: 100%;
   height: 100%;
   pointer-events: none;
+}
+
+.store-flow-field {
   background:
     radial-gradient(circle at 50% 10%, rgba(255, 82, 119, 0.14), transparent 28rem),
     #050507;
@@ -1066,6 +1165,14 @@ footer p,
 
 .store-flow-field canvas {
   opacity: 0.78;
+}
+
+.store-bloodline {
+  background: #050507;
+}
+
+.store-bloodline canvas {
+  opacity: 0.6;
 }
 
 .store-page::before {
@@ -1113,6 +1220,7 @@ footer p,
 }
 
 .store-filter a {
+  display: block;
   padding: 0.75rem 0.85rem;
   border-radius: 8px;
   color: #d7d1d9;
@@ -1159,12 +1267,18 @@ footer p,
   padding-bottom: 4rem;
 }
 
-.product-flow-field {
+.product-bloodline {
   position: fixed;
   inset: 0;
   z-index: 0;
+  width: 100%;
+  height: 100%;
   pointer-events: none;
-  opacity: 0.62;
+  background: #050507;
+}
+
+.product-bloodline canvas {
+  opacity: 0.6;
 }
 
 .product-page::before {
@@ -1326,6 +1440,7 @@ footer p,
 .feature-box {
   margin-top: 1rem;
   padding: 1rem 1.2rem;
+  animation: soft-rise 520ms ease both;
 }
 
 .feature-tabs {
@@ -1344,6 +1459,15 @@ footer p,
   cursor: pointer;
   padding-bottom: 0.45rem;
   font: inherit;
+  transition:
+    color 180ms ease,
+    transform 180ms ease,
+    border-color 180ms ease;
+}
+
+.feature-tabs button:hover {
+  color: #fff;
+  transform: translateY(-1px);
 }
 
 .feature-tabs button.active {
@@ -1439,8 +1563,9 @@ footer p,
 }
 
 .duration-option {
+  position: relative;
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
   gap: 0.9rem;
   min-height: 4.5rem;
@@ -1449,13 +1574,44 @@ footer p,
   border-radius: 8px;
   background: var(--panel-soft);
   cursor: pointer;
+  overflow: hidden;
+  animation: soft-rise 520ms ease both;
+  transition:
+    border-color 180ms ease,
+    background 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
+}
+
+.duration-option:nth-child(2) {
+  animation-delay: 60ms;
+}
+
+.duration-option:nth-child(3) {
+  animation-delay: 120ms;
+}
+
+.duration-option:nth-child(4) {
+  animation-delay: 180ms;
+}
+
+.duration-option:hover:not(.disabled) {
+  border-color: rgba(255, 82, 119, 0.48);
+  background: rgba(31, 31, 35, 0.98);
+  transform: translateY(-2px);
 }
 
 .duration-option input {
-  order: 3;
-  width: 1rem;
-  height: 1rem;
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
   accent-color: var(--accent);
+}
+
+.duration-option span,
+.duration-option b,
+.buy-button {
+  z-index: 1;
 }
 
 .duration-option span {
@@ -1468,13 +1624,18 @@ footer p,
 }
 
 .duration-option b {
+  justify-self: end;
   color: #fff;
   font-size: 1.08rem;
+  white-space: nowrap;
 }
 
 .duration-option.selected {
   border-color: var(--accent);
   box-shadow: inset 0 0 0 1px rgba(255, 82, 119, 0.28);
+  animation:
+    soft-rise 520ms ease both,
+    selected-breathe 2.8s ease-in-out infinite;
 }
 
 .duration-option.disabled {
@@ -1516,10 +1677,13 @@ footer p,
 
 .purchase-actions {
   gap: 0.7rem;
+  margin-top: 1.35rem;
 }
 
 .cart-button,
 .buy-button {
+  position: relative;
+  overflow: hidden;
   flex: 1;
   min-height: 3.25rem;
   border: 0;
@@ -1849,22 +2013,98 @@ footer p,
   cursor: wait;
 }
 
-footer {
-  justify-content: space-between;
-  gap: 1rem;
-  padding-block: 2rem;
-  border-top: 1px solid var(--line);
-  background: rgba(8, 8, 10, 0.82);
+.footer-section {
+  position: relative;
+  width: 100%;
+  margin: 0;
+  padding: 2.6rem clamp(1rem, 4vw, 4.5rem);
+  border-top: 1px solid;
+  border-image: linear-gradient(
+      90deg,
+      rgba(255, 82, 119, 0.66),
+      rgba(69, 230, 160, 0.28),
+      rgba(85, 160, 255, 0.5)
+    )
+    1;
+  border-radius: 0;
+  background: rgba(8, 8, 10, 0.94);
 }
 
-footer p {
-  margin-bottom: 0;
+.footer-inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(1.4rem, 5vw, 4rem);
+  max-width: 1216px;
+  margin: 0 auto;
+}
+
+.footer-brand {
+  display: inline-grid;
+  justify-self: start;
+  gap: 0.55rem;
+  color: #fff;
+  font-weight: 850;
+  animation: soft-rise 520ms ease both;
+}
+
+.footer-logo {
+  width: 2.75rem;
+  height: 2.75rem;
+  object-fit: contain;
+  filter: drop-shadow(0 0 18px rgba(255, 82, 119, 0.32));
+}
+
+.footer-social div {
+  display: flex;
+  align-items: center;
+}
+
+.footer-social a {
+  transition:
+    color 180ms ease,
+    transform 180ms ease;
+}
+
+.footer-social a:hover {
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+.footer-social {
+  display: grid;
+  justify-items: end;
+  gap: 0.75rem;
+  color: var(--muted);
+  font-size: 0.84rem;
+  animation: soft-rise 520ms ease 80ms both;
+}
+
+.footer-social div {
+  gap: 0.8rem;
+}
+
+.footer-social svg {
+  width: 1.15rem;
+  height: 1.15rem;
 }
 
 @media (max-width: 1050px) {
   .ticker,
   .trust-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .footer-inner {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    text-align: center;
+  }
+
+  .footer-brand,
+  .footer-social {
+    justify-self: center;
+    justify-items: center;
   }
 
   .discord-panel,
@@ -1936,7 +2176,7 @@ footer p {
     padding: 1.2rem;
   }
 
-  .discord-widget {
+  .discord-chat {
     min-height: 420px;
   }
 
@@ -1949,8 +2189,7 @@ footer p {
   }
 
   .purchase-actions,
-  .payment-grid,
-  footer {
+  .payment-grid {
     align-items: stretch;
     flex-direction: column;
   }

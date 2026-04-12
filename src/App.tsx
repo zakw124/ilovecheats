@@ -1,17 +1,21 @@
 import { useEffect, useRef, useState } from "react";
 import NeuralBackground from "@/components/ui/flow-field-background";
 import SilkShader from "@/components/ui/bloodline";
+import { Footer } from "@/components/ui/footer-section";
 import { RadarPanel } from "@/components/ui/radar-effect";
+import { RippleEffect } from "@/components/ui/ripple-effect-creator";
+import { Lightbulb } from "lucide-react";
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import {
   createCheckout,
+  fetchDiscordMessages,
   fetchProduct,
   fetchProductStatus,
   fetchProducts,
   getProductImage
 } from "./api";
-import type { Product, ProductVariant } from "./types";
+import type { DiscordChatMessage, Product, ProductVariant } from "./types";
 
 type ProductFeature = {
   group: string;
@@ -25,6 +29,30 @@ type StoreProduct = Product & {
   detected?: boolean;
   features?: ProductFeature[];
 };
+
+function getProductGroup(product: StoreProduct) {
+  if (typeof product.group === "string" && product.group.trim()) {
+    return product.group.trim();
+  }
+
+  if (product.group && typeof product.group === "object") {
+    const groupName = product.group.name || product.group.title;
+
+    if (groupName?.trim()) {
+      return groupName.trim();
+    }
+  }
+
+  return product.group_name || product.category || "Keys";
+}
+
+function slugify(value: string) {
+  return value
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+}
 
 declare global {
   interface Window {
@@ -72,7 +100,6 @@ const fallbackProducts: StoreProduct[] = [
     price: 19.99,
     currency: "USD",
     stock: 128,
-    badge_text: "Instant delivery",
     category: "Operating System",
     platform: "Windows 10 & 11",
     detected: true,
@@ -128,7 +155,6 @@ const fallbackProducts: StoreProduct[] = [
     price: 34.99,
     currency: "USD",
     stock: 72,
-    badge_text: "Best seller",
     category: "Productivity",
     platform: "Windows 10 & 11",
     detected: true,
@@ -147,7 +173,6 @@ const fallbackProducts: StoreProduct[] = [
     price: 12.49,
     currency: "USD",
     stock: 45,
-    badge_text: "Trending",
     category: "Gaming",
     platform: "Xbox & PC",
     detected: true,
@@ -166,7 +191,6 @@ const fallbackProducts: StoreProduct[] = [
     price: 16.99,
     currency: "USD",
     stock: 91,
-    badge_text: "Fresh stock",
     category: "Security",
     platform: "Windows, macOS, Android",
     detected: true,
@@ -185,7 +209,6 @@ const fallbackProducts: StoreProduct[] = [
     price: 9.99,
     currency: "USD",
     stock: 60,
-    badge_text: "Hot",
     category: "Privacy",
     platform: "All devices",
     images: [
@@ -203,7 +226,6 @@ const fallbackProducts: StoreProduct[] = [
     price: 27.99,
     currency: "USD",
     stock: 23,
-    badge_text: "Limited",
     category: "Creative",
     platform: "Windows & macOS",
     images: [
@@ -221,7 +243,6 @@ const fallbackProducts: StoreProduct[] = [
     price: 20,
     currency: "USD",
     stock: 140,
-    badge_text: "Instant",
     status_text: "Live",
     status_color: "#21d66b",
     category: "Gaming",
@@ -241,7 +262,6 @@ const fallbackProducts: StoreProduct[] = [
     price: 10.99,
     currency: "USD",
     stock: 34,
-    badge_text: "Console",
     status_text: "Low Stock",
     status_color: "#f4b740",
     category: "Gaming",
@@ -261,7 +281,6 @@ const fallbackProducts: StoreProduct[] = [
     price: 8.99,
     currency: "USD",
     stock: 48,
-    badge_text: "Fast",
     status_text: "Live",
     status_color: "#21d66b",
     category: "Gaming",
@@ -278,7 +297,6 @@ const fallbackProducts: StoreProduct[] = [
     price: 44.99,
     currency: "USD",
     stock: 19,
-    badge_text: "Admin",
     status_text: "Live",
     status_color: "#21d66b",
     category: "Operating System",
@@ -295,7 +313,6 @@ const fallbackProducts: StoreProduct[] = [
     price: 18.49,
     currency: "USD",
     stock: 25,
-    badge_text: "Bundle",
     status_text: "Live",
     status_color: "#21d66b",
     category: "Productivity",
@@ -312,7 +329,6 @@ const fallbackProducts: StoreProduct[] = [
     price: 14.99,
     currency: "USD",
     stock: 87,
-    badge_text: "Secure",
     status_text: "Live",
     status_color: "#21d66b",
     category: "Security",
@@ -329,7 +345,6 @@ const fallbackProducts: StoreProduct[] = [
     price: 11.99,
     currency: "USD",
     stock: 58,
-    badge_text: "Cloud",
     status_text: "Live",
     status_color: "#21d66b",
     category: "Productivity",
@@ -346,7 +361,6 @@ const fallbackProducts: StoreProduct[] = [
     price: 22.99,
     currency: "USD",
     stock: 16,
-    badge_text: "AI",
     status_text: "Limited",
     status_color: "#f4b740",
     category: "Creative",
@@ -363,7 +377,6 @@ const fallbackProducts: StoreProduct[] = [
     price: 39.99,
     currency: "USD",
     stock: 12,
-    badge_text: "Studio",
     status_text: "Live",
     status_color: "#21d66b",
     category: "Creative",
@@ -617,7 +630,7 @@ function getPathProductId() {
   return decodeURIComponent(id || "");
 }
 
-function Header({ cartCount }: { cartCount: number }) {
+function Header() {
   return (
     <header className="site-header">
       <a className="brand" href="/">
@@ -630,10 +643,11 @@ function Header({ cartCount }: { cartCount: number }) {
         <a href="/status">Status</a>
         <a href="/#discord">Discord</a>
       </nav>
-      <a className="store-pill" href="/store">
-        <span className="cart-count">{cartCount}</span>
-        Store
-      </a>
+      <RippleEffect rippleColor="rgba(255, 255, 255, 0.34)">
+        <a className="store-pill" href="/store">
+          Store
+        </a>
+      </RippleEffect>
     </header>
   );
 }
@@ -648,7 +662,7 @@ function ProductCard({
   const status = getProductStatus(product);
   const startingPrice = getStartingPrice(product);
   const description =
-    truncateText(stripHtml(product.description)) || "Instant delivery after checkout.";
+    truncateText(stripHtml(product.description)) || "Product details update at checkout.";
 
   return (
     <article className="product-card">
@@ -657,7 +671,7 @@ function ProductCard({
       </a>
       <div className="product-body">
         <div className="product-meta">
-          <span>{product.badge_text || product.category || "Digital key"}</span>
+          <span>{getProductGroup(product) || "Digital key"}</span>
           <span style={{ color: status.color }}>{status.text}</span>
         </div>
         <h3>
@@ -669,7 +683,9 @@ function ProductCard({
             <span>Starting from</span>
             {currency(startingPrice, product.currency)}
           </strong>
-          <a href={`/product/${product.id}`}>View</a>
+          <RippleEffect rippleColor="rgba(255, 255, 255, 0.34)">
+            <a className="rainbow-button" href={`/product/${product.id}`}>View</a>
+          </RippleEffect>
         </div>
       </div>
     </article>
@@ -891,24 +907,30 @@ function HomePage({
             undetected products made simple.
           </p>
           <div className="hero-actions">
-            <a className="primary-button" href="/store">
-              Shop live stock
-            </a>
-            <a className="secondary-button" href="#discord">
-              Join Discord
-            </a>
-            <button
-              className="model-toggle"
-              type="button"
-              onClick={() =>
-                setSelectedModelId((current) =>
-                  current === "ak47-sheen" ? "ak47" : "ak47-sheen"
-                )
-              }
-              aria-label="Toggle chams model"
-            >
-              <span aria-hidden="true" />
-            </button>
+            <RippleEffect rippleColor="rgba(255, 255, 255, 0.34)">
+              <a className="primary-button rainbow-button" href="/store">
+                View Store
+              </a>
+            </RippleEffect>
+            <RippleEffect rippleColor="rgba(255, 255, 255, 0.3)">
+              <a className="secondary-button" href="#discord">
+                Join Discord
+              </a>
+            </RippleEffect>
+            <RippleEffect rippleColor="rgba(255, 82, 119, 0.34)">
+              <button
+                className="model-toggle"
+                type="button"
+                onClick={() =>
+                  setSelectedModelId((current) =>
+                    current === "ak47-sheen" ? "ak47" : "ak47-sheen"
+                  )
+                }
+                aria-label="Toggle chams model"
+              >
+                <Lightbulb aria-hidden="true" />
+              </button>
+            </RippleEffect>
           </div>
         </div>
         <div className="hero-model-panel">
@@ -952,8 +974,6 @@ function HomePage({
         </div>
       </section>
 
-      <DiscordSection />
-
       <section className="trust-band" id="trust" aria-labelledby="trust-title">
         <div>
           <p className="eyebrow">Delivery Flow</p>
@@ -977,12 +997,55 @@ function HomePage({
           </div>
         </div>
       </section>
+
+      <DiscordSection />
     </>
   );
 }
 
 function DiscordSection() {
-  const widgetUrl = import.meta.env.VITE_DISCORD_WIDGET_URL as string | undefined;
+  const inviteUrl =
+    (import.meta.env.VITE_DISCORD_INVITE_URL as string | undefined) || "https://discord.com";
+  const [messages, setMessages] = useState<DiscordChatMessage[]>([]);
+  const [isConfigured, setIsConfigured] = useState(true);
+  const [isLoadingChat, setIsLoadingChat] = useState(true);
+  const [chatError, setChatError] = useState("");
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadMessages() {
+      try {
+        const payload = await fetchDiscordMessages(8);
+
+        if (!isMounted) {
+          return;
+        }
+
+        setIsConfigured(payload.configured);
+        setMessages(payload.messages);
+        setChatError(payload.error || "");
+      } catch (error) {
+        if (!isMounted) {
+          return;
+        }
+
+        setChatError(error instanceof Error ? error.message : "Unable to load Discord chat");
+      } finally {
+        if (isMounted) {
+          setIsLoadingChat(false);
+        }
+      }
+    }
+
+    void loadMessages();
+    const interval = window.setInterval(() => void loadMessages(), 30000);
+
+    return () => {
+      isMounted = false;
+      window.clearInterval(interval);
+    };
+  }, []);
 
   return (
     <section className="discord-section" id="discord" aria-labelledby="discord-title">
@@ -1002,48 +1065,54 @@ function DiscordSection() {
             <li>Share configs, tips, and strategies</li>
             <li>Exclusive giveaways and promotions</li>
           </ul>
-          <a className="discord-button" href="https://discord.com" target="_blank" rel="noreferrer">
+          <a className="discord-button" href={inviteUrl} target="_blank" rel="noreferrer">
             <span className="discord-icon" aria-hidden="true" />
             Join Discord
           </a>
         </div>
 
-        <div className="discord-widget" aria-label="Discord community preview">
-          {widgetUrl ? (
-            <iframe src={widgetUrl} title="Discord server widget" />
-          ) : (
-            <>
-              <div className="discord-widget-top">
-                <strong>Discord</strong>
-                <span>958 Members Online</span>
-              </div>
-              <div className="discord-server-name">ILC Community</div>
-              <div className="discord-list-label">MEMBERS ONLINE</div>
-              {[
-                "I DEX AiM MA.COM",
-                "CN 97 Studio",
-                "costa",
-                "Boazoz",
-                "2.0",
-                "abuelo",
-                "ania",
-                "arma",
-                "Aybars",
-                "Barkle",
-                "Beshik",
-                "bladeflurry"
-              ].map((member, index) => (
-                <div className="discord-member" key={member}>
-                  <span style={{ backgroundColor: index % 2 ? "#ff5277" : "#48e0a4" }} />
-                  {member}
-                </div>
-              ))}
-              <div className="discord-bottom">
-                <span>Hangout with people who get it</span>
-                <button type="button">Join Discord</button>
-              </div>
-            </>
-          )}
+        <div className="discord-chat" aria-label="Discord chat preview">
+          <div className="discord-chat-top">
+            <div>
+              <strong># live-chat</strong>
+              <span>Latest messages</span>
+            </div>
+            <span className="discord-live-dot" aria-hidden="true" />
+          </div>
+
+          <div className="discord-message-list">
+            {isLoadingChat ? (
+              <p className="discord-empty">Loading the latest chat...</p>
+            ) : !isConfigured ? (
+              <p className="discord-empty">
+                Add a Discord bot token and channel ID to show live chat here.
+              </p>
+            ) : chatError ? (
+              <p className="discord-empty">{chatError}</p>
+            ) : messages.length > 0 ? (
+              messages.map((message) => (
+                <article className="discord-message" key={message.id}>
+                  <img src={message.avatarUrl} alt="" />
+                  <div>
+                    <div className="discord-message-meta">
+                      <strong>{message.author}</strong>
+                      {message.bot ? <span>BOT</span> : null}
+                    </div>
+                    <p>{message.content}</p>
+                  </div>
+                </article>
+              ))
+            ) : (
+              <p className="discord-empty">No recent messages yet.</p>
+            )}
+          </div>
+
+          <div className="discord-bottom">
+            <span>Jump into the conversation</span>
+            <a href={inviteUrl} target="_blank" rel="noreferrer">
+              Join
+            </a>
+          </div>
         </div>
       </div>
     </section>
@@ -1057,21 +1126,15 @@ function StorePage({
   products: StoreProduct[];
   error: string;
 }) {
-  const categories = Array.from(new Set(products.map((item) => item.category || "Keys")));
+  const categories = Array.from(new Set(products.map((item) => getProductGroup(item))));
   const productsByCategory = categories.map((category) => ({
     category,
-    products: products.filter((product) => (product.category || "Keys") === category)
+    products: products.filter((product) => getProductGroup(product) === category)
   }));
 
   return (
     <section className="store-page">
-      <NeuralBackground
-        className="store-flow-field"
-        color="#ff5277"
-        trailOpacity={0.08}
-        particleCount={520}
-        speed={0.45}
-      />
+      <SilkShader className="store-bloodline" />
       <div className="store-heading">
         <p className="eyebrow">Full Store</p>
         <h1>Choose your next key.</h1>
@@ -1082,9 +1145,11 @@ function StorePage({
         <aside className="store-filter">
           <span>Categories</span>
           {categories.map((category) => (
-            <a href={`#${category.toLowerCase().replaceAll(" ", "-")}`} key={category}>
-              {category}
-            </a>
+            <RippleEffect rippleColor="rgba(255, 82, 119, 0.24)" key={category}>
+              <a href={`#${slugify(category)}`}>
+                {category}
+              </a>
+            </RippleEffect>
           ))}
         </aside>
 
@@ -1092,7 +1157,7 @@ function StorePage({
           {productsByCategory.map((group) => (
             <section
               className="store-category"
-              id={group.category.toLowerCase().replaceAll(" ", "-")}
+              id={slugify(group.category)}
               key={group.category}
             >
               <div className="category-heading">
@@ -1195,13 +1260,7 @@ function ProductPage({
 
   return (
     <section className="product-page">
-      <NeuralBackground
-        className="product-flow-field"
-        color="#ff5277"
-        trailOpacity={0.1}
-        particleCount={360}
-        speed={0.35}
-      />
+      <SilkShader className="product-bloodline" />
       <div className="product-layout">
         <div className="product-media">
           <button
@@ -1269,26 +1328,31 @@ function ProductPage({
               const disabled = stock <= 0;
 
               return (
-                <label
-                  className={`duration-option ${
-                    String(selectedVariant) === String(variant.id) ? "selected" : ""
-                  } ${disabled ? "disabled" : ""}`}
+                <RippleEffect
+                  disabled={disabled}
                   key={variant.id || variant.name}
+                  rippleColor="rgba(255, 82, 119, 0.28)"
                 >
-                  <input
-                    type="radio"
-                    name="duration"
-                    value={String(variant.id)}
-                    checked={String(selectedVariant) === String(variant.id)}
-                    disabled={disabled}
-                    onChange={() => setSelectedVariant(variant.id || "default")}
-                  />
-                  <span>
-                    <strong>{variant.name || "Standard"}</strong>
-                    <small>{disabled ? "Out of stock" : `${stock} in stock`}</small>
-                  </span>
-                  <b>{currency(variant.price, product.currency)}</b>
-                </label>
+                  <label
+                    className={`duration-option ${
+                      String(selectedVariant) === String(variant.id) ? "selected" : ""
+                    } ${disabled ? "disabled" : ""}`}
+                  >
+                    <input
+                      type="radio"
+                      name="duration"
+                      value={String(variant.id)}
+                      checked={String(selectedVariant) === String(variant.id)}
+                      disabled={disabled}
+                      onChange={() => setSelectedVariant(variant.id || "default")}
+                    />
+                    <span>
+                      <strong>{variant.name || "Standard"}</strong>
+                      <small>{disabled ? "Out of stock" : `${stock} in stock`}</small>
+                    </span>
+                    <b>{currency(variant.price, product.currency)}</b>
+                  </label>
+                </RippleEffect>
               );
             })}
           </div>
@@ -1300,28 +1364,33 @@ function ProductPage({
           </div>
 
           <div className="purchase-actions">
-            <button
-              type="button"
-              className="buy-button full-width"
-              onClick={async (event) => {
-                try {
-                  await openSellAuthCheckout(
-                    event.currentTarget,
-                    product,
-                    selected.id || "default"
-                  );
-                } catch {
-                  window.location.assign(
-                    `/checkout/${product.id}?variant=${encodeURIComponent(
-                      String(selected.id || "default")
-                    )}`
-                  );
-                }
-              }}
+            <RippleEffect
               disabled={checkoutId === product.id}
+              rippleColor="rgba(255, 255, 255, 0.36)"
             >
-              {checkoutId === product.id ? "Opening" : "Buy now"}
-            </button>
+              <button
+                type="button"
+                className="buy-button full-width"
+                onClick={async (event) => {
+                  try {
+                    await openSellAuthCheckout(
+                      event.currentTarget,
+                      product,
+                      selected.id || "default"
+                    );
+                  } catch {
+                    window.location.assign(
+                      `/checkout/${product.id}?variant=${encodeURIComponent(
+                        String(selected.id || "default")
+                      )}`
+                    );
+                  }
+                }}
+                disabled={checkoutId === product.id}
+              >
+                {checkoutId === product.id ? "Opening" : "Buy now"}
+              </button>
+            </RippleEffect>
           </div>
 
           <p className="gateway-note">
@@ -1406,7 +1475,7 @@ function StatusPage({ products }: { products: StoreProduct[] }) {
               />
               <div>
                 <strong>{product.name}</strong>
-                <small>{product.category || "Digital key"}</small>
+                <small>{getProductGroup(product) || "Digital key"}</small>
               </div>
               <b style={{ color: status.color }}>
                 {status.text}
@@ -1600,18 +1669,6 @@ function CheckoutPage({
   );
 }
 
-function Footer() {
-  return (
-    <footer id="support">
-      <div>
-        <strong>ilovecheats.com</strong>
-        <p>{import.meta.env.VITE_SUPPORT_EMAIL || "support@example.com"}</p>
-      </div>
-      <p>Built for Railway with a private SellAuth API proxy.</p>
-    </footer>
-  );
-}
-
 export default function App() {
   const [products, setProducts] = useState<StoreProduct[]>(fallbackProducts);
   const [isLive, setIsLive] = useState(false);
@@ -1681,7 +1738,7 @@ export default function App() {
 
   return (
     <main>
-      <Header cartCount={1} />
+      <Header />
       {route === "store" ? (
         <StorePage products={products} error={error} />
       ) : route === "status" ? (

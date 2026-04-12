@@ -35,6 +35,24 @@ type SellAuthShop = {
   url?: string;
 };
 
+type DiscordApiMessage = {
+  id: string;
+  content?: string;
+  timestamp?: string;
+  author?: {
+    id?: string;
+    username?: string;
+    global_name?: string | null;
+    avatar?: string | null;
+    bot?: boolean;
+  };
+  attachments?: Array<{
+    filename?: string;
+    url?: string;
+  }>;
+  embeds?: unknown[];
+};
+
 function getErrorMessage(payload: unknown) {
   if (payload && typeof payload === "object") {
     const record = payload as { error?: unknown; message?: unknown };
@@ -101,6 +119,17 @@ async function enrichProductStatuses(payload: unknown) {
   return payload;
 }
 
+function getDiscordAvatarUrl(message: DiscordApiMessage, index: number) {
+  const author = message.author;
+
+  if (author?.id && author.avatar) {
+    const extension = author.avatar.startsWith("a_") ? "gif" : "png";
+    return `https://cdn.discordapp.com/avatars/${author.id}/${author.avatar}.${extension}?size=64`;
+  }
+
+  return `https://cdn.discordapp.com/embed/avatars/${index % 5}.png`;
+}
+
 app.use(cors({ origin: process.env.CORS_ORIGIN || true }));
 app.use(express.json({ limit: "1mb" }));
 
@@ -152,6 +181,65 @@ app.get("/api/storefront/products/:productId/status", async (request, response, 
       statusText: product.status_text || "Live",
       statusColor: product.status_color || "#21d66b",
       stock: product.stock
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.get("/api/discord/messages", async (request, response, next) => {
+  try {
+    const token = process.env.DISCORD_BOT_TOKEN;
+    const channelId = process.env.DISCORD_CHANNEL_ID;
+    const limit = Math.min(Math.max(Number(request.query.limit || 8), 1), 20);
+
+    if (!token || !channelId) {
+      response.json({
+        configured: false,
+        messages: []
+      });
+      return;
+    }
+
+    const discordResponse = await fetch(
+      `https://discord.com/api/v10/channels/${channelId}/messages?limit=${limit}`,
+      {
+        headers: {
+          Authorization: `Bot ${token}`,
+          "User-Agent": "ILCFRONTEND Discord Preview (https://ilovecheats.com, 1.0)"
+        }
+      }
+    );
+
+    if (!discordResponse.ok) {
+      response.status(discordResponse.status).json({
+        configured: true,
+        error: "Unable to load Discord chat"
+      });
+      return;
+    }
+
+    const payload = (await discordResponse.json()) as DiscordApiMessage[];
+
+    response.json({
+      configured: true,
+      messages: payload.reverse().map((message, index) => {
+        const attachment = message.attachments?.[0];
+        const hasEmbed = Boolean(message.embeds?.length);
+
+        return {
+          id: message.id,
+          author: message.author?.global_name || message.author?.username || "Discord Member",
+          avatarUrl: getDiscordAvatarUrl(message, index),
+          content:
+            message.content ||
+            (attachment ? `Shared ${attachment.filename || "an attachment"}` : "") ||
+            (hasEmbed ? "Shared an embed" : ""),
+          timestamp: message.timestamp,
+          attachmentUrl: attachment?.url,
+          bot: Boolean(message.author?.bot)
+        };
+      })
     });
   } catch (error) {
     next(error);

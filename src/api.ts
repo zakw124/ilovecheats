@@ -1,4 +1,4 @@
-import type { Product, ProductsResponse } from "./types";
+import type { DiscordMessagesResponse, Product, ProductsResponse } from "./types";
 
 export async function fetchProducts() {
   const response = await fetch("/api/storefront/products");
@@ -76,6 +76,16 @@ export async function createCheckout(input: {
     hosted_url?: string;
     url?: string;
   };
+}
+
+export async function fetchDiscordMessages(limit = 8) {
+  const response = await fetch(`/api/discord/messages?limit=${limit}`);
+
+  if (!response.ok) {
+    throw new Error("Unable to load Discord chat");
+  }
+
+  return (await response.json()) as DiscordMessagesResponse;
 }
 
 export function getProductImage(product: Product, fallbackIndex: number) {

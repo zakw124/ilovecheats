@@ -10,6 +10,8 @@ export type ProductVariant = {
 export type Product = {
   id: number | string;
   name: string;
+  group?: string | { name?: string; title?: string };
+  group_name?: string;
   description?: string;
   meta_description?: string;
   instructions?: string;
@@ -38,3 +40,19 @@ export type ProductsResponse =
       products?: Product[];
       meta?: Record<string, unknown>;
     };
+
+export type DiscordChatMessage = {
+  id: string;
+  author: string;
+  avatarUrl: string;
+  content: string;
+  timestamp?: string;
+  attachmentUrl?: string;
+  bot?: boolean;
+};
+
+export type DiscordMessagesResponse = {
+  configured: boolean;
+  messages: DiscordChatMessage[];
+  error?: string;
+};
