@@ -1,5 +1,13 @@
 import type { DiscordMessagesResponse, Product, ProductsResponse } from "./types";
 
+export function unwrapProducts(payload: ProductsResponse) {
+  if (Array.isArray(payload)) {
+    return payload;
+  }
+
+  return payload.data || payload.products || [];
+}
+
 export async function fetchProducts() {
   const response = await fetch("/api/storefront/products");
 
@@ -9,11 +17,7 @@ export async function fetchProducts() {
 
   const payload = (await response.json()) as ProductsResponse;
 
-  if (Array.isArray(payload)) {
-    return payload;
-  }
-
-  return payload.data || payload.products || [];
+  return unwrapProducts(payload);
 }
 
 export async function fetchProduct(productId: string | number) {
@@ -88,7 +92,7 @@ export async function fetchDiscordMessages(limit = 8) {
   return (await response.json()) as DiscordMessagesResponse;
 }
 
-export function getProductImage(product: Product, fallbackIndex: number) {
+export function getProductImage(product: Product, _fallbackIndex: number) {
   const images = product.images || [];
   const firstImage = images[0];
 
@@ -108,12 +112,5 @@ export function getProductImage(product: Product, fallbackIndex: number) {
     return firstImage.path;
   }
 
-  const fallbackImages = [
-    "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=900&q=80",
-    "https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=900&q=80",
-    "https://images.unsplash.com/photo-1605648916361-9bc12ad6a569?auto=format&fit=crop&w=900&q=80",
-    "https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=900&q=80"
-  ];
-
-  return product.image || fallbackImages[fallbackIndex % fallbackImages.length];
+  return product.image || "";
 }

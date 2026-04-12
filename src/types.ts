@@ -56,3 +56,14 @@ export type DiscordMessagesResponse = {
   messages: DiscordChatMessage[];
   error?: string;
 };
+
+export type InitialAppData = {
+  products?: Product[];
+  productsError?: string;
+};
+
+declare global {
+  interface Window {
+    __INITIAL_APP_DATA__?: InitialAppData;
+  }
+}

@@ -84,6 +84,13 @@
   }
 }
 
+@keyframes loading-breathe {
+  50% {
+    opacity: 0.42;
+    transform: scale(1.08);
+  }
+}
+
 * {
   box-sizing: border-box;
 }
@@ -821,6 +828,24 @@ h1 {
   background: #17171b;
 }
 
+.product-image-loading,
+.image-loading-panel {
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+  background:
+    linear-gradient(110deg, rgba(255, 255, 255, 0.04), rgba(255, 82, 119, 0.08), rgba(255, 255, 255, 0.04)),
+    #17171b;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.product-image-loading {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 7px 7px 0 0;
+}
+
 .product-body {
   display: grid;
   gap: 0.78rem;
@@ -1340,6 +1365,10 @@ h1 {
   object-fit: cover;
 }
 
+.main-shot.image-loading-panel {
+  min-height: 18rem;
+}
+
 .thumbnail-row {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1351,6 +1380,30 @@ h1 {
   width: 100%;
   aspect-ratio: 16 / 4.2;
   object-fit: cover;
+}
+
+.thumbnail-loading {
+  aspect-ratio: 16 / 4.2;
+  border-radius: 8px;
+}
+
+.loading-section {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  min-height: 18rem;
+  place-items: center;
+  gap: 1rem;
+  color: var(--muted);
+}
+
+.loading-pulse {
+  width: 2.2rem;
+  height: 2.2rem;
+  border: 1px solid rgba(255, 82, 119, 0.58);
+  border-radius: 50%;
+  background: var(--accent-soft);
+  animation: loading-breathe 1.4s ease-in-out infinite;
 }
 
 .image-lightbox {

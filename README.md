@@ -55,6 +55,7 @@ Dark ecommerce storefront for trendy tech product keys, backed by a private Sell
    ```
 
 The React app runs on port `5173`. The Express API runs on port `8787`. Vite forwards `/api` requests to Express automatically.
+Production renders the first page on the server and embeds the initial product payload for hydration.
 
 Useful local pages:
 
@@ -112,6 +113,7 @@ Leave it disabled for public storefront deployments. The storefront routes above
    SELLAUTH_SHOP_ID=your_real_shop_id
    SELLAUTH_API_BASE=https://api.sellauth.com/v1
    SELLAUTH_PROXY_ENABLED=false
+   STOREFRONT_CACHE_MS=60000
    VITE_SELLAUTH_SHOP_ID=your_real_shop_id
    VITE_STORE_NAME=ILC Keys
    VITE_SUPPORT_EMAIL=support@example.com

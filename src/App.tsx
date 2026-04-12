@@ -15,7 +15,7 @@ import {
   fetchProducts,
   getProductImage
 } from "./api";
-import type { DiscordChatMessage, Product, ProductVariant } from "./types";
+import type { DiscordChatMessage, InitialAppData, Product, ProductVariant } from "./types";
 
 type ProductFeature = {
   group: string;
@@ -91,321 +91,24 @@ const heroModels = [
   }
 ];
 
-const fallbackProducts: StoreProduct[] = [
-  {
-    id: "windows-11-pro",
-    name: "Windows 11 Pro Key",
-    description:
-      "Retail activation for fresh builds, gaming rigs, and workstations with instant delivery.",
-    price: 19.99,
-    currency: "USD",
-    stock: 128,
-    category: "Operating System",
-    platform: "Windows 10 & 11",
-    detected: true,
-    images: [
-      "https://images.unsplash.com/photo-1633419461186-7d40a38105ec?auto=format&fit=crop&w=1200&q=85"
-    ],
-    gallery: [
-      "https://images.unsplash.com/photo-1633419461186-7d40a38105ec?auto=format&fit=crop&w=1200&q=85",
-      "https://images.unsplash.com/photo-1593642632823-8f785ba67e45?auto=format&fit=crop&w=1200&q=85",
-      "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1200&q=85"
-    ],
-    variants: [
-      { id: "1-day", name: "1 Day", price: 12.99, stock: 2 },
-      { id: "3-days", name: "3 Days", price: 17.99, stock: 0 },
-      { id: "1-week", name: "1 Week", price: 29.99, stock: 2 },
-      { id: "1-month", name: "1 Month", price: 64.99, stock: 1 }
-    ],
-    features: [
-      {
-        group: "Activation",
-        items: [
-          "Retail activation key",
-          "Fresh install support",
-          "Digital delivery after checkout",
-          "Works on custom PC builds",
-          "Activation guide included"
-        ]
-      },
-      {
-        group: "Security",
-        items: [
-          "Private order delivery",
-          "SellAuth fulfilment",
-          "Receipt sent by email",
-          "Support-ready order lookup"
-        ]
-      },
-      {
-        group: "Config",
-        items: [
-          "Instant stock sync",
-          "Single-use product key",
-          "Regional notes in checkout",
-          "Refund rules shown before payment"
-        ]
-      }
-    ]
-  },
-  {
-    id: "office-2024",
-    name: "Office 2024 Professional",
-    description: "Lifetime productivity suite access for documents, sheets, mail, and decks.",
-    price: 34.99,
-    currency: "USD",
-    stock: 72,
-    category: "Productivity",
-    platform: "Windows 10 & 11",
-    detected: true,
-    images: [
-      "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1200&q=85"
-    ],
-    variants: [
-      { id: "home", name: "Home", price: 24.99, stock: 18 },
-      { id: "pro", name: "Professional", price: 34.99, stock: 72 }
-    ]
-  },
-  {
-    id: "game-pass",
-    name: "Game Pass Ultimate",
-    description: "Stackable membership codes for cloud, console, and PC play.",
-    price: 12.49,
-    currency: "USD",
-    stock: 45,
-    category: "Gaming",
-    platform: "Xbox & PC",
-    detected: true,
-    images: [
-      "https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=1200&q=85"
-    ],
-    variants: [
-      { id: "trial", name: "Trial", price: 4.99, stock: 20 },
-      { id: "month", name: "1 Month", price: 12.49, stock: 45 }
-    ]
-  },
-  {
-    id: "security-suite",
-    name: "Security Suite Premium",
-    description: "Multi-device protection with fast account delivery.",
-    price: 16.99,
-    currency: "USD",
-    stock: 91,
-    category: "Security",
-    platform: "Windows, macOS, Android",
-    detected: true,
-    images: [
-      "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=1200&q=85"
-    ],
-    variants: [
-      { id: "1-device", name: "1 Device", price: 16.99, stock: 91 },
-      { id: "5-device", name: "5 Devices", price: 29.99, stock: 34 }
-    ]
-  },
-  {
-    id: "developer-vpn",
-    name: "Developer VPN Pro",
-    description: "Fast private browsing plan for testers, traders, and remote work.",
-    price: 9.99,
-    currency: "USD",
-    stock: 60,
-    category: "Privacy",
-    platform: "All devices",
-    images: [
-      "https://images.unsplash.com/photo-1563986768494-4dee2763ff3f?auto=format&fit=crop&w=1200&q=85"
-    ],
-    variants: [
-      { id: "month", name: "1 Month", price: 9.99, stock: 60 },
-      { id: "year", name: "1 Year", price: 54.99, stock: 12 }
-    ]
-  },
-  {
-    id: "creative-cloud",
-    name: "Creator Toolkit Access",
-    description: "Design, video, and asset tooling access for creators shipping daily.",
-    price: 27.99,
-    currency: "USD",
-    stock: 23,
-    category: "Creative",
-    platform: "Windows & macOS",
-    images: [
-      "https://images.unsplash.com/photo-1558655146-9f40138edfeb?auto=format&fit=crop&w=1200&q=85"
-    ],
-    variants: [
-      { id: "standard", name: "Standard", price: 27.99, stock: 23 },
-      { id: "studio", name: "Studio", price: 49.99, stock: 8 }
-    ]
-  },
-  {
-    id: "steam-wallet",
-    name: "Steam Wallet Code",
-    description: "Top up your account for new releases, DLC, and in-game items.",
-    price: 20,
-    currency: "USD",
-    stock: 140,
-    status_text: "Live",
-    status_color: "#21d66b",
-    category: "Gaming",
-    platform: "Steam",
-    images: [
-      "https://images.unsplash.com/photo-1493711662062-fa541adb3fc8?auto=format&fit=crop&w=1200&q=85"
-    ],
-    variants: [
-      { id: "20", name: "$20", price: 20, stock: 140 },
-      { id: "50", name: "$50", price: 50, stock: 66 }
-    ]
-  },
-  {
-    id: "playstation-plus",
-    name: "PlayStation Plus Essential",
-    description: "Membership access for multiplayer, monthly games, and cloud saves.",
-    price: 10.99,
-    currency: "USD",
-    stock: 34,
-    status_text: "Low Stock",
-    status_color: "#f4b740",
-    category: "Gaming",
-    platform: "PlayStation",
-    images: [
-      "https://images.unsplash.com/photo-1606144042614-b2417e99c4e3?auto=format&fit=crop&w=1200&q=85"
-    ],
-    variants: [
-      { id: "1-month", name: "1 Month", price: 10.99, stock: 34 },
-      { id: "12-month", name: "12 Months", price: 69.99, stock: 5 }
-    ]
-  },
-  {
-    id: "xbox-live",
-    name: "Xbox Core Pass",
-    description: "Online multiplayer and selected catalogue access for Xbox players.",
-    price: 8.99,
-    currency: "USD",
-    stock: 48,
-    status_text: "Live",
-    status_color: "#21d66b",
-    category: "Gaming",
-    platform: "Xbox",
-    images: [
-      "https://images.unsplash.com/photo-1621259182978-fbf93132d53d?auto=format&fit=crop&w=1200&q=85"
-    ],
-    variants: [{ id: "1-month", name: "1 Month", price: 8.99, stock: 48 }]
-  },
-  {
-    id: "windows-server",
-    name: "Windows Server Key",
-    description: "Server activation for labs, small business boxes, and admin stacks.",
-    price: 44.99,
-    currency: "USD",
-    stock: 19,
-    status_text: "Live",
-    status_color: "#21d66b",
-    category: "Operating System",
-    platform: "Windows Server",
-    images: [
-      "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=1200&q=85"
-    ],
-    variants: [{ id: "standard", name: "Standard", price: 44.99, stock: 19 }]
-  },
-  {
-    id: "mac-utility",
-    name: "Mac Utility Bundle",
-    description: "Cleanup, password, backup, and workflow utilities for macOS setups.",
-    price: 18.49,
-    currency: "USD",
-    stock: 25,
-    status_text: "Live",
-    status_color: "#21d66b",
-    category: "Productivity",
-    platform: "macOS",
-    images: [
-      "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=1200&q=85"
-    ],
-    variants: [{ id: "bundle", name: "Bundle", price: 18.49, stock: 25 }]
-  },
-  {
-    id: "password-manager",
-    name: "Password Manager Family",
-    description: "Encrypted vault access for teams, families, and solo operators.",
-    price: 14.99,
-    currency: "USD",
-    stock: 87,
-    status_text: "Live",
-    status_color: "#21d66b",
-    category: "Security",
-    platform: "All devices",
-    images: [
-      "https://images.unsplash.com/photo-1614064641938-3bbee52942c7?auto=format&fit=crop&w=1200&q=85"
-    ],
-    variants: [{ id: "family", name: "Family", price: 14.99, stock: 87 }]
-  },
-  {
-    id: "cloud-storage",
-    name: "Cloud Storage Pro",
-    description: "Expanded storage access for backups, media, and shared projects.",
-    price: 11.99,
-    currency: "USD",
-    stock: 58,
-    status_text: "Live",
-    status_color: "#21d66b",
-    category: "Productivity",
-    platform: "Web, desktop, mobile",
-    images: [
-      "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1200&q=85"
-    ],
-    variants: [{ id: "1tb", name: "1 TB", price: 11.99, stock: 58 }]
-  },
-  {
-    id: "ai-assistant",
-    name: "AI Assistant Pro",
-    description: "Premium assistant access for writing, coding, research, and planning.",
-    price: 22.99,
-    currency: "USD",
-    stock: 16,
-    status_text: "Limited",
-    status_color: "#f4b740",
-    category: "Creative",
-    platform: "Web",
-    images: [
-      "https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&w=1200&q=85"
-    ],
-    variants: [{ id: "pro", name: "Pro", price: 22.99, stock: 16 }]
-  },
-  {
-    id: "music-producer",
-    name: "Producer Studio Suite",
-    description: "Audio tools for beatmaking, mixing, recording, and plugin workflows.",
-    price: 39.99,
-    currency: "USD",
-    stock: 12,
-    status_text: "Live",
-    status_color: "#21d66b",
-    category: "Creative",
-    platform: "Windows & macOS",
-    images: [
-      "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&w=1200&q=85"
-    ],
-    variants: [{ id: "suite", name: "Suite", price: 39.99, stock: 12 }]
-  }
-];
+const loadingProduct: StoreProduct = {
+  id: "loading",
+  name: "Loading",
+  description: "Loading product details.",
+  price: 0,
+  currency: "USD",
+  stock: 0,
+  variants: [{ id: "loading", name: "Loading", price: 0, stock: 0 }]
+};
 
 const defaultFeatures: ProductFeature[] = [
   {
-    group: "Includes",
-    items: [
-      "Instant digital delivery",
-      "Email receipt and order lookup",
-      "Activation notes included",
-      "SellAuth-powered fulfilment"
-    ]
+    group: "Details",
+    items: ["Loading product details."]
   },
   {
     group: "Support",
-    items: [
-      "Staff support after purchase",
-      "Fresh stock monitoring",
-      "Replacement review workflow",
-      "Private order handling"
-    ]
+    items: ["Loading support details."]
   }
 ];
 
@@ -596,10 +299,7 @@ function getDescriptionTabs(
 }
 
 function normalizeProducts(items: Product[]) {
-  return items.map((item, index) => ({
-    ...fallbackProducts[index % fallbackProducts.length],
-    ...item
-  })) as StoreProduct[];
+  return items as StoreProduct[];
 }
 
 function getProductImages(product: StoreProduct) {
@@ -621,6 +321,10 @@ function getProductImages(product: StoreProduct) {
 }
 
 function getPathProductId() {
+  if (typeof window === "undefined") {
+    return "";
+  }
+
   const [, route, id] = window.location.pathname.split("/");
 
   if (!["product", "checkout"].includes(route)) {
@@ -667,7 +371,11 @@ function ProductCard({
   return (
     <article className="product-card">
       <a href={`/product/${product.id}`} aria-label={`View ${product.name}`}>
-        <img src={getProductImage(product, index)} alt="" />
+        {getProductImage(product, index) ? (
+          <img src={getProductImage(product, index)} alt="" />
+        ) : (
+          <div className="product-image-loading">Loading image</div>
+        )}
       </a>
       <div className="product-body">
         <div className="product-meta">
@@ -689,6 +397,15 @@ function ProductCard({
         </div>
       </div>
     </article>
+  );
+}
+
+function LoadingSection({ label = "Loading live stock" }: { label?: string }) {
+  return (
+    <section className="loading-section" aria-live="polite">
+      <div className="loading-pulse" />
+      <p>{label}</p>
+    </section>
   );
 }
 
@@ -890,7 +607,7 @@ function HomePage({
   isLive: boolean;
   error: string;
 }) {
-  const featuredProduct = products[0] || fallbackProducts[0];
+  const featuredProduct = products[0];
   const [selectedModelId, setSelectedModelId] = useState("ak47-sheen");
   const selectedModel =
     heroModels.find((model) => model.id === selectedModelId) || heroModels[0];
@@ -942,7 +659,7 @@ function HomePage({
       </section>
 
       <section className="ticker" aria-label="Store highlights">
-        <span>{isLive ? "Live SellAuth stock" : "Demo stock active"}</span>
+        <span>{isLive ? "Live SellAuth stock" : "Loading live stock"}</span>
         <span>Instant product key delivery</span>
         <span>Card and crypto ready</span>
         <span>Railway deployable</span>
@@ -952,7 +669,7 @@ function HomePage({
         <div>
           <p className="eyebrow">Drop of the day</p>
           <h2 id="featured-title">Always under the radar.</h2>
-          <p>{stripHtml(featuredProduct.description)}</p>
+          <p>{featuredProduct ? stripHtml(featuredProduct.description) : "Loading live product details."}</p>
         </div>
         <RadarPanel />
       </section>
@@ -968,9 +685,13 @@ function HomePage({
         </div>
 
         <div className="product-grid">
-          {products.slice(0, 4).map((product, index) => (
-            <ProductCard product={product} index={index} key={product.id} />
-          ))}
+          {products.length > 0 ? (
+            products.slice(0, 4).map((product, index) => (
+              <ProductCard product={product} index={index} key={product.id} />
+            ))
+          ) : (
+            <LoadingSection />
+          )}
         </div>
       </section>
 
@@ -1126,6 +847,20 @@ function StorePage({
   products: StoreProduct[];
   error: string;
 }) {
+  if (products.length === 0) {
+    return (
+      <section className="store-page">
+        <SilkShader className="store-bloodline" />
+        <div className="store-heading">
+          <p className="eyebrow">Full Store</p>
+          <h1>Loading live stock.</h1>
+          <p>{error || "Fetching products from SellAuth."}</p>
+        </div>
+        <LoadingSection />
+      </section>
+    );
+  }
+
   const categories = Array.from(new Set(products.map((item) => getProductGroup(item))));
   const productsByCategory = categories.map((category) => ({
     category,
@@ -1187,7 +922,8 @@ function ProductPage({
   checkoutId: string | number | null;
 }) {
   const productId = getPathProductId();
-  const baseProduct = products.find((item) => String(item.id) === productId) || products[0];
+  const realProduct = products.find((item) => String(item.id) === productId) || products[0];
+  const baseProduct = realProduct || loadingProduct;
   const [liveProduct, setLiveProduct] = useState<{
     id: string;
     product: StoreProduct;
@@ -1196,11 +932,7 @@ function ProductPage({
   const product =
     liveProduct?.id === String(productId) ? liveProduct.product : baseProduct;
   const productImages = getProductImages(product);
-  const gallery = productImages.length > 0 ? productImages : [
-    getProductImage(product, 0),
-    getProductImage(product, 1),
-    getProductImage(product, 2)
-  ];
+  const gallery = productImages;
   const variants =
     product.variants && product.variants.length > 0
       ? product.variants
@@ -1258,6 +990,15 @@ function ProductPage({
     );
   }
 
+  if (!realProduct) {
+    return (
+      <section className="product-page">
+        <SilkShader className="product-bloodline" />
+        <LoadingSection label="Loading product details" />
+      </section>
+    );
+  }
+
   return (
     <section className="product-page">
       <SilkShader className="product-bloodline" />
@@ -1268,7 +1009,11 @@ function ProductPage({
             type="button"
             onClick={() => setActiveImage(0)}
           >
-            <img className="main-shot" src={gallery[0]} alt="" />
+            {gallery[0] ? (
+              <img className="main-shot" src={gallery[0]} alt="" />
+            ) : (
+              <div className="main-shot image-loading-panel">Loading image</div>
+            )}
           </button>
           <div className="thumbnail-row">
             {gallery.slice(0, 3).map((image, index) => (
@@ -1280,6 +1025,13 @@ function ProductPage({
                 <img src={image} alt="" />
               </button>
             ))}
+            {gallery.length === 0
+              ? [0, 1, 2].map((item) => (
+                  <div className="thumbnail-loading image-loading-panel" key={item}>
+                    Loading
+                  </div>
+                ))
+              : null}
           </div>
 
           <div className="feature-box">
@@ -1464,7 +1216,9 @@ function StatusPage({ products }: { products: StoreProduct[] }) {
       </div>
 
       <div className="status-list">
-        {products.map((product) => {
+        {products.length === 0 ? (
+          <LoadingSection />
+        ) : products.map((product) => {
           const status = getProductStatus(product);
 
           return (
@@ -1506,8 +1260,11 @@ function CheckoutPage({
   ) => void;
 }) {
   const productId = getPathProductId();
-  const product = products.find((item) => String(item.id) === productId) || products[0];
-  const query = new URLSearchParams(window.location.search);
+  const realProduct = products.find((item) => String(item.id) === productId) || products[0];
+  const product = realProduct || loadingProduct;
+  const query = new URLSearchParams(
+    typeof window !== "undefined" ? window.location.search : ""
+  );
   const variants =
     product.variants && product.variants.length > 0
       ? product.variants
@@ -1542,6 +1299,14 @@ function CheckoutPage({
         })
       );
   }, [isLive, product]);
+
+  if (!realProduct) {
+    return (
+      <section className="checkout-page">
+        <LoadingSection label="Loading checkout" />
+      </section>
+    );
+  }
 
   return (
     <section className="checkout-page">
@@ -1669,14 +1434,28 @@ function CheckoutPage({
   );
 }
 
-export default function App() {
-  const [products, setProducts] = useState<StoreProduct[]>(fallbackProducts);
-  const [isLive, setIsLive] = useState(false);
-  const [error, setError] = useState("");
+export default function App({
+  initialData,
+  initialRoute
+}: {
+  initialData?: InitialAppData;
+  initialRoute?: string;
+} = {}) {
+  const initialProducts = normalizeProducts(initialData?.products || []);
+  const [products, setProducts] = useState<StoreProduct[]>(initialProducts);
+  const [isLive, setIsLive] = useState(initialProducts.length > 0);
+  const [error, setError] = useState(initialData?.productsError || "");
   const [checkoutId, setCheckoutId] = useState<string | number | null>(null);
-  const route = window.location.pathname.split("/")[1] || "home";
+  const route =
+    initialRoute ||
+    (typeof window !== "undefined" ? window.location.pathname.split("/")[1] : "") ||
+    "home";
 
   useEffect(() => {
+    if (initialProducts.length > 0) {
+      return;
+    }
+
     fetchProducts()
       .then((items) => {
         if (items.length > 0) {
@@ -1687,7 +1466,7 @@ export default function App() {
       .catch(() => {
         setError("Live stock connects after SellAuth credentials are added.");
       });
-  }, []);
+  }, [initialProducts.length]);
 
   useEffect(() => {
     void loadSellAuthEmbed();
@@ -1765,3 +1544,4 @@ export default function App() {
     </main>
   );
 }
+

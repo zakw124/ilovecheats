@@ -1,8 +1,9 @@
 import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
+import fs from "node:fs/promises";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { z } from "zod";
 import { SellAuthError, shopPath, sellauthRequest, type SellAuthMethod } from "./sellauth.js";
 
@@ -13,6 +14,7 @@ const port = Number(process.env.PORT || process.env.SERVER_PORT || 8787);
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const publicDir = path.resolve(__dirname, "../dist");
+const ssrEntryPath = path.resolve(__dirname, "../dist-ssr/entry-server.js");
 const checkoutSchema = z.object({
   productId: z.union([z.number(), z.string()]),
   variantId: z.union([z.number(), z.string()]),
@@ -34,6 +36,16 @@ type SellAuthProduct = {
 type SellAuthShop = {
   url?: string;
 };
+
+type CacheEntry<T> = {
+  expires: number;
+  value: T;
+};
+
+let productsCache: CacheEntry<unknown> | null = null;
+const productCache = new Map<string, CacheEntry<unknown>>();
+const productStatusCache = new Map<string, CacheEntry<unknown>>();
+const storefrontCacheMs = Number(process.env.STOREFRONT_CACHE_MS || 60000);
 
 type DiscordApiMessage = {
   id: string;
@@ -119,6 +131,76 @@ async function enrichProductStatuses(payload: unknown) {
   return payload;
 }
 
+async function cached<T>(entry: CacheEntry<T> | undefined | null, loader: () => Promise<T>) {
+  if (entry && entry.expires > Date.now()) {
+    return entry.value;
+  }
+
+  return loader();
+}
+
+async function getCachedProducts(query: URLSearchParams) {
+  return cached(productsCache, async () => {
+    const payload = await sellauthRequest(shopPath("products"), { query });
+    const value = await enrichProductStatuses(payload);
+    productsCache = {
+      value,
+      expires: Date.now() + storefrontCacheMs
+    };
+    return value;
+  });
+}
+
+async function getCachedProduct(productId: string | number) {
+  const key = String(productId);
+
+  return cached(productCache.get(key), async () => {
+    const value = await sellauthRequest(shopPath(`products/${productId}`));
+    productCache.set(key, {
+      value,
+      expires: Date.now() + storefrontCacheMs
+    });
+    return value;
+  });
+}
+
+async function getCachedProductStatus(productId: string | number) {
+  const key = String(productId);
+
+  return cached(productStatusCache.get(key), async () => {
+    const product = await sellauthRequest<{
+      status_text?: string;
+      status_color?: string;
+      stock?: number;
+    }>(shopPath(`products/${productId}`));
+    const value = {
+      statusText: product.status_text || "Live",
+      statusColor: product.status_color || "#21d66b",
+      stock: product.stock
+    };
+
+    productStatusCache.set(key, {
+      value,
+      expires: Date.now() + storefrontCacheMs
+    });
+    return value;
+  });
+}
+
+function serializeInitialData(payload: unknown) {
+  return JSON.stringify(payload).replace(/</g, "\\u003c");
+}
+
+async function getSsrProducts() {
+  const query = new URLSearchParams();
+  query.set("perPage", "48");
+  query.set("page", "1");
+  query.set("orderColumn", "products_sold");
+  query.set("orderDirection", "desc");
+
+  return getCachedProducts(query);
+}
+
 function getDiscordAvatarUrl(message: DiscordApiMessage, index: number) {
   const author = message.author;
 
@@ -151,8 +233,7 @@ app.get("/api/storefront/products", async (request, response, next) => {
     query.set("orderColumn", String(request.query.orderColumn || "products_sold"));
     query.set("orderDirection", String(request.query.orderDirection || "desc"));
 
-    const payload = await sellauthRequest(shopPath("products"), { query });
-    response.json(await enrichProductStatuses(payload));
+    response.json(await getCachedProducts(query));
   } catch (error) {
     next(error);
   }
@@ -160,10 +241,7 @@ app.get("/api/storefront/products", async (request, response, next) => {
 
 app.get("/api/storefront/products/:productId", async (request, response, next) => {
   try {
-    const payload = await sellauthRequest(
-      shopPath(`products/${request.params.productId}`)
-    );
-    response.json(payload);
+    response.json(await getCachedProduct(request.params.productId));
   } catch (error) {
     next(error);
   }
@@ -171,17 +249,7 @@ app.get("/api/storefront/products/:productId", async (request, response, next) =
 
 app.get("/api/storefront/products/:productId/status", async (request, response, next) => {
   try {
-    const product = await sellauthRequest<{
-      status_text?: string;
-      status_color?: string;
-      stock?: number;
-    }>(shopPath(`products/${request.params.productId}`));
-
-    response.json({
-      statusText: product.status_text || "Live",
-      statusColor: product.status_color || "#21d66b",
-      stock: product.stock
-    });
+    response.json(await getCachedProductStatus(request.params.productId));
   } catch (error) {
     next(error);
   }
@@ -342,10 +410,46 @@ app.all("/api/sellauth/*path", async (request, response, next) => {
   }
 });
 
-app.use(express.static(publicDir));
+app.use(
+  express.static(publicDir, {
+    index: false,
+    maxAge: process.env.NODE_ENV === "production" ? "1y" : 0
+  })
+);
 
-app.use((_request, response) => {
-  response.sendFile(path.join(publicDir, "index.html"));
+app.use(async (request, response, next) => {
+  try {
+    const template = await fs.readFile(path.join(publicDir, "index.html"), "utf-8");
+    let initialData = {};
+
+    try {
+      initialData = {
+        products: getPayloadProducts(await getSsrProducts())
+      };
+    } catch {
+      initialData = {
+        products: [],
+        productsError: "Loading live stock"
+      };
+    }
+
+    const { render } = (await import(pathToFileURL(ssrEntryPath).href)) as {
+      render: (url: string, data: unknown) => string;
+    };
+    const html = template
+      .replace("<!--app-html-->", render(request.originalUrl, initialData))
+      .replace(
+        "{\"products\":[]}",
+        serializeInitialData(initialData)
+      );
+
+    response
+      .status(200)
+      .set({ "Content-Type": "text/html" })
+      .send(html);
+  } catch (error) {
+    next(error);
+  }
 });
 
 app.use(
