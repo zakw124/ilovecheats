@@ -62,6 +62,18 @@
   }
 }
 
+@keyframes widget-pop {
+  from {
+    opacity: 0;
+    transform: translateY(0.5rem) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
 @keyframes soft-rise {
   from {
     opacity: 0;
@@ -1039,7 +1051,11 @@ h1 {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  min-height: 500px;
+  width: 100%;
+  max-width: 350px;
+  height: min(58vh, 500px);
+  min-height: 0;
+  max-height: 500px;
   border-radius: 8px;
   background: #1b1c21;
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.36);
@@ -1082,6 +1098,8 @@ h1 {
   flex: 1;
   flex-direction: column;
   gap: 0.8rem;
+  min-height: 0;
+  overflow-y: auto;
   padding: 1rem;
 }
 
@@ -1137,7 +1155,7 @@ h1 {
   display: grid;
   flex: 1;
   place-items: center;
-  min-height: 18rem;
+  min-height: 12rem;
   text-align: center;
 }
 
@@ -1158,6 +1176,101 @@ h1 {
   background: #3b3d45;
   color: #fff;
   text-decoration: none;
+}
+
+.floating-discord {
+  position: fixed;
+  right: clamp(1rem, 3vw, 1.5rem);
+  bottom: clamp(1rem, 3vw, 1.5rem);
+  z-index: 80;
+  display: grid;
+  justify-items: end;
+  gap: 0.8rem;
+  pointer-events: none;
+}
+
+.floating-discord-panel,
+.floating-discord .ripple-target {
+  pointer-events: auto;
+}
+
+.floating-discord-panel {
+  position: relative;
+  width: min(360px, calc(100vw - 2rem));
+  transform-origin: bottom right;
+  animation: widget-pop 180ms ease-out;
+}
+
+.floating-discord-chat {
+  width: 100%;
+  max-width: none;
+  height: min(66vh, 460px);
+  max-height: calc(100vh - 7.4rem);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow:
+    0 24px 70px rgba(0, 0, 0, 0.54),
+    0 0 0 1px rgba(255, 82, 119, 0.08);
+}
+
+.floating-discord-chat .discord-chat-top {
+  padding: 1rem;
+}
+
+.floating-discord-chat .discord-chat-top strong {
+  font-size: 1.05rem;
+}
+
+.floating-discord-chat .discord-message-list {
+  gap: 0.65rem;
+  padding: 0.75rem;
+}
+
+.floating-discord-chat .discord-message {
+  min-height: auto;
+  padding: 0.65rem;
+}
+
+.floating-discord-close {
+  position: absolute;
+  top: 0.7rem;
+  right: 0.75rem;
+  z-index: 2;
+  width: 2rem;
+  height: 2rem;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  background: rgba(18, 18, 20, 0.28);
+  color: #fff;
+  cursor: pointer;
+}
+
+.floating-discord-close svg,
+.floating-discord-button svg {
+  width: 1.15rem;
+  height: 1.15rem;
+}
+
+.floating-discord-button {
+  width: 3.45rem;
+  height: 3.45rem;
+  display: grid;
+  place-items: center;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, rgba(18, 18, 20, 0.98), rgba(37, 18, 29, 0.96)) padding-box,
+    linear-gradient(90deg, #ff5277, #ffd65a, #45e6a0, #55a0ff, #b25eff, #ff5277) border-box;
+  background-size:
+    auto,
+    200% 100%;
+  color: #fff;
+  box-shadow:
+    0 0 18px rgba(255, 82, 119, 0.2),
+    0 18px 42px rgba(0, 0, 0, 0.42);
+  cursor: pointer;
+  animation: rainbow-slide 9s linear infinite;
 }
 
 .trust-band {
@@ -2287,7 +2400,8 @@ h1 {
   }
 
   .discord-chat {
-    min-height: 420px;
+    height: min(62vh, 420px);
+    max-height: 420px;
   }
 
   .product-layout {

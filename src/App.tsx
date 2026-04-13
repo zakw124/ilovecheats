@@ -4,7 +4,7 @@ import SilkShader from "@/components/ui/bloodline";
 import { Footer } from "@/components/ui/footer-section";
 import { RadarPanel } from "@/components/ui/radar-effect";
 import { RippleEffect } from "@/components/ui/ripple-effect-creator";
-import { Lightbulb } from "lucide-react";
+import { Lightbulb, MessageCircle, X } from "lucide-react";
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import {
@@ -732,7 +732,7 @@ function HomePage({
   );
 }
 
-function DiscordSection() {
+function useDiscordChat(limit = 8) {
   const [messages, setMessages] = useState<DiscordChatMessage[]>([]);
   const [isConfigured, setIsConfigured] = useState(true);
   const [isLoadingChat, setIsLoadingChat] = useState(true);
@@ -743,7 +743,7 @@ function DiscordSection() {
 
     async function loadMessages() {
       try {
-        const payload = await fetchDiscordMessages(8);
+        const payload = await fetchDiscordMessages(limit);
 
         if (!isMounted) {
           return;
@@ -772,8 +772,65 @@ function DiscordSection() {
       isMounted = false;
       window.clearInterval(interval);
     };
-  }, []);
+  }, [limit]);
 
+  return { chatError, isConfigured, isLoadingChat, messages };
+}
+
+function DiscordChatPanel({ className = "" }: { className?: string }) {
+  const { chatError, isConfigured, isLoadingChat, messages } = useDiscordChat(8);
+
+  return (
+    <div
+      className={`discord-chat ${className}`.trim()}
+      aria-label="Discord chat preview"
+    >
+      <div className="discord-chat-top">
+        <div>
+          <strong># live-chat</strong>
+          <span>Latest messages</span>
+        </div>
+        <span className="discord-live-dot" aria-hidden="true" />
+      </div>
+
+      <div className="discord-message-list">
+        {isLoadingChat ? (
+          <p className="discord-empty">Loading the latest chat...</p>
+        ) : !isConfigured ? (
+          <p className="discord-empty">
+            Add a Discord bot token and channel ID to show live chat here.
+          </p>
+        ) : chatError ? (
+          <p className="discord-empty">{chatError}</p>
+        ) : messages.length > 0 ? (
+          messages.map((message) => (
+            <article className="discord-message" key={message.id}>
+              <img src={message.avatarUrl} alt="" />
+              <div>
+                <div className="discord-message-meta">
+                  <strong>{message.author}</strong>
+                  {message.bot ? <span>BOT</span> : null}
+                </div>
+                <p>{message.content}</p>
+              </div>
+            </article>
+          ))
+        ) : (
+          <p className="discord-empty">No recent messages yet.</p>
+        )}
+      </div>
+
+      <div className="discord-bottom">
+        <span>Jump into the conversation</span>
+        <a href={discordInviteUrl} target="_blank" rel="noreferrer">
+          Join
+        </a>
+      </div>
+    </div>
+  );
+}
+
+function DiscordSection() {
   return (
     <section className="discord-section" id="discord" aria-labelledby="discord-title">
       <div className="discord-panel">
@@ -798,51 +855,42 @@ function DiscordSection() {
           </a>
         </div>
 
-        <div className="discord-chat" aria-label="Discord chat preview">
-          <div className="discord-chat-top">
-            <div>
-              <strong># live-chat</strong>
-              <span>Latest messages</span>
-            </div>
-            <span className="discord-live-dot" aria-hidden="true" />
-          </div>
-
-          <div className="discord-message-list">
-            {isLoadingChat ? (
-              <p className="discord-empty">Loading the latest chat...</p>
-            ) : !isConfigured ? (
-              <p className="discord-empty">
-                Add a Discord bot token and channel ID to show live chat here.
-              </p>
-            ) : chatError ? (
-              <p className="discord-empty">{chatError}</p>
-            ) : messages.length > 0 ? (
-              messages.map((message) => (
-                <article className="discord-message" key={message.id}>
-                  <img src={message.avatarUrl} alt="" />
-                  <div>
-                    <div className="discord-message-meta">
-                      <strong>{message.author}</strong>
-                      {message.bot ? <span>BOT</span> : null}
-                    </div>
-                    <p>{message.content}</p>
-                  </div>
-                </article>
-              ))
-            ) : (
-              <p className="discord-empty">No recent messages yet.</p>
-            )}
-          </div>
-
-          <div className="discord-bottom">
-            <span>Jump into the conversation</span>
-            <a href={discordInviteUrl} target="_blank" rel="noreferrer">
-              Join
-            </a>
-          </div>
-        </div>
+        <DiscordChatPanel />
       </div>
     </section>
+  );
+}
+
+function FloatingDiscordWidget() {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <div className={`floating-discord ${isOpen ? "open" : ""}`}>
+      {isOpen ? (
+        <div className="floating-discord-panel">
+          <button
+            className="floating-discord-close"
+            type="button"
+            aria-label="Close Discord chat"
+            onClick={() => setIsOpen(false)}
+          >
+            <X aria-hidden="true" />
+          </button>
+          <DiscordChatPanel className="floating-discord-chat" />
+        </div>
+      ) : null}
+
+      <RippleEffect rippleColor="rgba(255, 255, 255, 0.34)">
+        <button
+          className="floating-discord-button"
+          type="button"
+          aria-label={isOpen ? "Close Discord chat" : "Open Discord chat"}
+          onClick={() => setIsOpen((current) => !current)}
+        >
+          {isOpen ? <X aria-hidden="true" /> : <MessageCircle aria-hidden="true" />}
+        </button>
+      </RippleEffect>
+    </div>
   );
 }
 
@@ -1553,6 +1601,7 @@ export default function App({
         <HomePage products={products} isLive={isLive} error={error} />
       )}
       <Footer />
+      <FloatingDiscordWidget />
     </main>
   );
 }
