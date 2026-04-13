@@ -190,6 +190,7 @@ img {
   display: block;
   width: 100%;
   height: 100%;
+  background: #050507;
 }
 
 .bloodline-background {
@@ -204,6 +205,7 @@ img {
   display: block;
   width: 100%;
   height: 100%;
+  background: #050507;
 }
 
 .site-header {
@@ -231,7 +233,6 @@ img {
 nav,
 .hero-actions,
 .product-footer,
-.product-meta,
 .store-pill,
 .platform-line,
 .purchase-actions,
@@ -305,7 +306,8 @@ nav a:hover {
 .store-pill,
 .coupon-row button,
 .process-button,
-.discord-bottom a {
+.discord-bottom a,
+.floating-discord-button {
   transition:
     transform 180ms ease,
     box-shadow 180ms ease,
@@ -324,10 +326,10 @@ nav a:hover {
 .store-pill:hover,
 .coupon-row button:hover,
 .process-button:not(:disabled):hover,
-.discord-bottom a:hover {
+.discord-bottom a:hover,
+.floating-discord-button:hover {
   transform: translateY(-2px);
   filter: brightness(1.08);
-  box-shadow: 0 18px 42px rgba(255, 82, 119, 0.3);
 }
 
 .primary-button:active,
@@ -341,7 +343,8 @@ nav a:hover {
 .store-pill:active,
 .coupon-row button:active,
 .process-button:not(:disabled):active,
-.discord-bottom a:active {
+.discord-bottom a:active,
+.floating-discord-button:active {
   transform: translateY(1px) scale(0.985);
   filter: brightness(0.96);
 }
@@ -447,7 +450,6 @@ nav a:hover {
 .model-toggle:hover {
   transform: translateY(-1px);
   background: rgba(255, 82, 119, 0.22);
-  box-shadow: 0 12px 30px rgba(255, 82, 119, 0.18);
 }
 
 .model-toggle:active {
@@ -859,6 +861,25 @@ h1 {
   background: #17171b;
 }
 
+.product-status-badge {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  z-index: 2;
+  max-width: calc(100% - 1.5rem);
+  padding: 0.34rem 0.58rem;
+  border: 1px solid color-mix(in srgb, currentColor 32%, transparent);
+  border-radius: 6px;
+  background: rgba(10, 10, 13, 0.74);
+  backdrop-filter: blur(10px);
+  font-size: 0.76rem;
+  font-weight: 850;
+  line-height: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .product-image-loading,
 .image-loading-panel {
   display: grid;
@@ -882,14 +903,6 @@ h1 {
   gap: 0.78rem;
   padding: 0.95rem;
   border-radius: 0 0 7px 7px;
-}
-
-.product-meta {
-  justify-content: space-between;
-  gap: 0.8rem;
-  color: var(--accent);
-  font-size: 0.78rem;
-  font-weight: 850;
 }
 
 .product-card h3 {
@@ -1257,20 +1270,13 @@ h1 {
   height: 3.45rem;
   display: grid;
   place-items: center;
-  border: 1px solid transparent;
+  border: 1px solid var(--line);
   border-radius: 8px;
-  background:
-    linear-gradient(135deg, rgba(18, 18, 20, 0.98), rgba(37, 18, 29, 0.96)) padding-box,
-    linear-gradient(90deg, #ff5277, #ffd65a, #45e6a0, #55a0ff, #b25eff, #ff5277) border-box;
-  background-size:
-    auto,
-    200% 100%;
+  background: rgba(255, 255, 255, 0.08);
   color: #fff;
-  box-shadow:
-    0 0 18px rgba(255, 82, 119, 0.2),
-    0 18px 42px rgba(0, 0, 0, 0.42);
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.42);
   cursor: pointer;
-  animation: rainbow-slide 9s linear infinite;
+  backdrop-filter: blur(14px);
 }
 
 .trust-band {
@@ -1526,7 +1532,6 @@ h1 {
 .thumbnail-row button:hover {
   transform: translateY(-2px);
   border-color: var(--accent);
-  box-shadow: 0 16px 38px rgba(255, 82, 119, 0.18);
 }
 
 .main-shot {
@@ -1754,18 +1759,20 @@ h1 {
   background: currentColor;
 }
 
-.windows-mark {
+.platform-badge {
   flex: 0 0 auto;
-  width: 1.85rem;
-  height: 1.85rem;
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 0.16rem;
-  filter: drop-shadow(0 0 12px rgba(56, 189, 248, 0.36));
-}
-
-.windows-mark span {
-  background: linear-gradient(135deg, #38bdf8, #2563eb);
+  min-width: 2.1rem;
+  min-height: 1.65rem;
+  display: inline-grid;
+  place-items: center;
+  padding: 0.28rem 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #c8c2cb;
+  font-size: 0.7rem;
+  font-weight: 850;
+  line-height: 1;
 }
 
 .platform-line {

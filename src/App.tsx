@@ -369,10 +369,13 @@ function ProductCard({
   const status = getProductStatus(product);
   const startingPrice = getStartingPrice(product);
   const description =
-    truncateText(stripHtml(product.description)) || "Product details update at checkout.";
+    truncateText(stripHtml(product.description), 100) || "Product details update at checkout.";
 
   return (
     <article className="product-card">
+      <span className="product-status-badge" style={{ color: status.color }}>
+        {status.text}
+      </span>
       <a href={`/product/${product.id}`} aria-label={`View ${product.name}`}>
         {getProductImage(product, index) ? (
           <img src={getProductImage(product, index)} alt="" />
@@ -381,10 +384,6 @@ function ProductCard({
         )}
       </a>
       <div className="product-body">
-        <div className="product-meta">
-          <span>{getProductGroup(product) || "Digital key"}</span>
-          <span style={{ color: status.color }}>{status.text}</span>
-        </div>
         <h3>
           <a href={`/product/${product.id}`}>{product.name}</a>
         </h3>
@@ -1123,11 +1122,8 @@ function ProductPage({
               <span />
               {productStatus.text}
             </div>
-            <div className="windows-mark" aria-label="Windows 11 compatible">
-              <span />
-              <span />
-              <span />
-              <span />
+            <div className="platform-badge" aria-label="Windows compatible">
+              Windows 10/11
             </div>
           </div>
           <h1>{product.name}</h1>

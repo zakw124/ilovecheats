@@ -97,7 +97,7 @@ interface SilkShaderProps {
 
 export default function SilkShader({ className }: SilkShaderProps = {}) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [isDark, setIsDark] = useState(false);
+  const [isDark, setIsDark] = useState(true);
 
   useEffect(() => {
     const checkTheme = () => {
@@ -130,6 +130,9 @@ export default function SilkShader({ className }: SilkShaderProps = {}) {
 
     const gl = canvas.getContext("webgl");
     if (!gl) return;
+
+    gl.clearColor(0.02, 0.02, 0.03, 1);
+    gl.clear(gl.COLOR_BUFFER_BIT);
 
     const createShader = (type: number, source: string) => {
       const shader = gl.createShader(type);
@@ -184,6 +187,8 @@ export default function SilkShader({ className }: SilkShaderProps = {}) {
       const dpr = window.devicePixelRatio || 1;
       canvas.width = canvas.clientWidth * dpr;
       canvas.height = canvas.clientHeight * dpr;
+      gl.clearColor(0.02, 0.02, 0.03, 1);
+      gl.clear(gl.COLOR_BUFFER_BIT);
     };
 
     const handleMouseMove = (event: MouseEvent) => {
