@@ -77,6 +77,7 @@ declare global {
 }
 
 const sellAuthShopId = Number(import.meta.env.VITE_SELLAUTH_SHOP_ID || 134680);
+const discordInviteUrl = "https://discord.gg/ilovecheats";
 
 const heroModels = [
   {
@@ -345,7 +346,9 @@ function Header() {
         <a href="/">Home</a>
         <a href="/store">Store</a>
         <a href="/status">Status</a>
-        <a href="/#discord">Discord</a>
+        <a href={discordInviteUrl} target="_blank" rel="noreferrer">
+          Discord
+        </a>
       </nav>
       <RippleEffect rippleColor="rgba(255, 255, 255, 0.34)">
         <a className="store-pill" href="/store">
@@ -630,7 +633,12 @@ function HomePage({
               </a>
             </RippleEffect>
             <RippleEffect rippleColor="rgba(255, 255, 255, 0.3)">
-              <a className="secondary-button" href="#discord">
+              <a
+                className="secondary-button"
+                href={discordInviteUrl}
+                target="_blank"
+                rel="noreferrer"
+              >
                 Join Discord
               </a>
             </RippleEffect>
@@ -659,15 +667,15 @@ function HomePage({
       </section>
 
       <section className="ticker" aria-label="Store highlights">
-        <span>{isLive ? "Live SellAuth stock" : "Loading live stock"}</span>
+        <span>{isLive ? "Undetected game cheats" : "Undetected game cheats"}</span>
         <span>Instant product key delivery</span>
         <span>Card and crypto ready</span>
-        <span>Railway deployable</span>
+        <span>24/7 Human Support</span>
       </section>
 
       <section className="featured" aria-labelledby="featured-title">
         <div>
-          <p className="eyebrow">Drop of the day</p>
+          <p className="eyebrow">Secure & Up to date</p>
           <h2 id="featured-title">Always under the radar.</h2>
           <p>{featuredProduct ? stripHtml(featuredProduct.description) : "Loading live product details."}</p>
         </div>
@@ -680,7 +688,7 @@ function HomePage({
           <h2 id="stock-title">Keys people are grabbing right now</h2>
           <p>
             {error ||
-              "Products load from SellAuth once your API key and shop ID are set."}
+              "See what the competition are using and beat them!"}
           </p>
         </div>
 
@@ -725,8 +733,6 @@ function HomePage({
 }
 
 function DiscordSection() {
-  const inviteUrl =
-    (import.meta.env.VITE_DISCORD_INVITE_URL as string | undefined) || "https://discord.com";
   const [messages, setMessages] = useState<DiscordChatMessage[]>([]);
   const [isConfigured, setIsConfigured] = useState(true);
   const [isLoadingChat, setIsLoadingChat] = useState(true);
@@ -786,7 +792,7 @@ function DiscordSection() {
             <li>Share configs, tips, and strategies</li>
             <li>Exclusive giveaways and promotions</li>
           </ul>
-          <a className="discord-button" href={inviteUrl} target="_blank" rel="noreferrer">
+          <a className="discord-button" href={discordInviteUrl} target="_blank" rel="noreferrer">
             <span className="discord-icon" aria-hidden="true" />
             Join Discord
           </a>
@@ -830,7 +836,7 @@ function DiscordSection() {
 
           <div className="discord-bottom">
             <span>Jump into the conversation</span>
-            <a href={inviteUrl} target="_blank" rel="noreferrer">
+            <a href={discordInviteUrl} target="_blank" rel="noreferrer">
               Join
             </a>
           </div>
@@ -871,9 +877,8 @@ function StorePage({
     <section className="store-page">
       <SilkShader className="store-bloodline" />
       <div className="store-heading">
-        <p className="eyebrow">Full Store</p>
         <h1>Choose your next key.</h1>
-        <p>{error || "Browse software, gaming, security, privacy, and creator tools."}</p>
+        <p>{error || "Browse our selection of the best game cheats on the market."}</p>
       </div>
 
       <div className="store-layout">
@@ -1002,6 +1007,13 @@ function ProductPage({
   return (
     <section className="product-page">
       <SilkShader className="product-bloodline" />
+      <div className="product-breadcrumb-row">
+        <nav className="product-breadcrumbs" aria-label="Breadcrumb">
+          <a href="/store">Store</a>
+          <span aria-hidden="true">/</span>
+          <strong>{product.name}</strong>
+        </nav>
+      </div>
       <div className="product-layout">
         <div className="product-media">
           <button
@@ -1212,7 +1224,7 @@ function StatusPage({ products }: { products: StoreProduct[] }) {
       <div className="store-heading">
         <p className="eyebrow">Live Status</p>
         <h1>Product availability at a glance.</h1>
-        <p>Status colours are pulled from SellAuth product data when live credentials are configured.</p>
+        <p>Status is updated live as soon as detections occur, You're never in the dark!</p>
       </div>
 
       <div className="status-list">
@@ -1544,4 +1556,3 @@ export default function App({
     </main>
   );
 }
-

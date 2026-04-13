@@ -3,6 +3,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { twMerge } from "tailwind-merge";
+import { Lock, VenetianMask, Wrench } from "lucide-react";
 
 export const Circle = ({
   className,
@@ -73,9 +74,9 @@ export const IconContainer = ({
 
 export function RadarPanel() {
   const icons = [
-    { text: "Stock", symbol: "S", delay: 0.2 },
-    { text: "Secure", symbol: "U", delay: 0.35 },
-    { text: "Stealth", symbol: "R", delay: 0.5 }
+    { text: "Undetected", icon: <VenetianMask />, delay: 0.2 },
+    { text: "Secure", icon: <Lock />, delay: 0.35 },
+    { text: "Reliable", icon: <Wrench />, delay: 0.5 }
   ];
 
   return (
@@ -85,7 +86,7 @@ export function RadarPanel() {
           <IconContainer
             text={item.text}
             delay={item.delay}
-            icon={<span>{item.symbol}</span>}
+            icon={item.icon}
             key={item.text}
             position={index}
           />

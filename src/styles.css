@@ -33,12 +33,22 @@
 }
 
 @keyframes radar-spin {
-  from {
-    transform: rotate(20deg);
+  0% {
+    opacity: 0;
+    transform: rotate(180deg);
   }
 
-  to {
-    transform: rotate(380deg);
+  8% {
+    opacity: 1;
+  }
+
+  92% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+    transform: rotate(360deg);
   }
 }
 
@@ -557,6 +567,9 @@ h1 {
 }
 
 .product-footer a.rainbow-button {
+  min-height: 2.45rem;
+  padding: 0.42rem 0.9rem;
+  line-height: 1;
   background:
     linear-gradient(135deg, rgba(18, 18, 20, 0.98), rgba(37, 18, 29, 0.96)) padding-box,
     linear-gradient(
@@ -660,6 +673,7 @@ h1 {
   bottom: 2.15rem;
   width: 32rem;
   height: 16rem;
+  overflow: hidden;
   transform: translateX(-50%);
 }
 
@@ -682,11 +696,11 @@ h1 {
   width: 16rem;
   height: 5px;
   align-items: end;
-  justify-content: center;
+  justify-content: flex-end;
   overflow: hidden;
   background: transparent;
   transform-origin: left center;
-  animation: radar-spin 10s linear infinite;
+  animation: radar-spin 8s linear infinite;
 }
 
 .radar-sweep div {
@@ -745,8 +759,13 @@ h1 {
     0 12px 34px rgba(255, 82, 119, 0.14);
 }
 
-.radar-icon span {
+.radar-icon span,
+.radar-icon svg {
   color: var(--accent);
+  width: 1.25rem;
+  height: 1.25rem;
+  stroke: currentColor;
+  stroke-width: 1.8;
   font-weight: 850;
 }
 
@@ -897,7 +916,7 @@ h1 {
 
 .product-footer a {
   min-width: 6.6rem;
-  min-height: 2.7rem;
+  min-height: 2.45rem;
   display: grid;
   place-items: center;
 }
@@ -1317,6 +1336,44 @@ h1 {
     linear-gradient(180deg, rgba(8, 8, 10, 0.25), rgba(8, 8, 10, 0.86));
 }
 
+.product-breadcrumb-row {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 1180px);
+  margin: 0 auto 1rem;
+}
+
+.product-breadcrumbs {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  max-width: 100%;
+  padding: 0.58rem 0.8rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(18, 18, 20, 0.78);
+  color: var(--muted);
+  font-size: 0.86rem;
+  backdrop-filter: blur(14px);
+}
+
+.product-breadcrumbs a {
+  color: var(--accent);
+  font-weight: 800;
+}
+
+.product-breadcrumbs a:hover {
+  color: #fff;
+}
+
+.product-breadcrumbs strong {
+  max-width: min(52vw, 34rem);
+  overflow: hidden;
+  color: #fff;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .product-layout {
   position: relative;
   z-index: 1;
@@ -1543,9 +1600,9 @@ h1 {
 }
 
 .purchase-panel h1 {
-  max-width: 17ch;
-  font-size: clamp(2rem, 3.2vw, 3rem);
-  line-height: 1.1;
+  max-width: 19ch;
+  font-size: clamp(1.65rem, 2.65vw, 2.35rem);
+  line-height: 1.04;
 }
 
 .purchase-panel h2 {
