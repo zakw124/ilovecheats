@@ -18,6 +18,9 @@
   --accent-strong: #ff275c;
   --accent-soft: rgba(255, 82, 119, 0.16);
   --success: #21d66b;
+  --page-gutter: clamp(1rem, 4vw, 4.5rem);
+  --wide-gutter: clamp(2.4rem, 5.2vw, 6rem);
+  --content-max: 1216px;
 }
 
 @keyframes rainbow-spin {
@@ -357,7 +360,7 @@ nav a:hover {
   align-items: start;
   gap: clamp(1rem, 3vw, 3.5rem);
   overflow: hidden;
-  padding: 7rem clamp(1rem, 4vw, 4.5rem) 6rem clamp(2.2rem, 7vw, 7rem);
+  padding: 7rem var(--page-gutter) 6rem clamp(2.2rem, 7vw, 7rem);
   background: #050507;
 }
 
@@ -635,7 +638,7 @@ h1 {
 .product-page,
 .status-page,
 .checkout-page {
-  padding-inline: clamp(1rem, 4vw, 4.5rem);
+  padding-inline: var(--page-gutter);
 }
 
 .featured {
@@ -808,8 +811,8 @@ h1 {
 }
 
 .store-page {
-  padding-left: max(clamp(2.4rem, 5.2vw, 6rem), env(safe-area-inset-left));
-  padding-right: max(clamp(2.4rem, 5.2vw, 6rem), env(safe-area-inset-right));
+  padding-left: max(var(--wide-gutter), env(safe-area-inset-left));
+  padding-right: max(var(--wide-gutter), env(safe-area-inset-right));
 }
 
 .section-heading,
@@ -955,7 +958,7 @@ h1 {
   grid-template-columns: minmax(0, 1.2fr) 350px;
   gap: clamp(2rem, 6vw, 5rem);
   align-items: center;
-  max-width: 1216px;
+  max-width: var(--content-max);
   margin: 0 auto;
   padding: clamp(2rem, 5vw, 3.8rem);
   border: 1px solid var(--line);
@@ -1426,6 +1429,7 @@ h1 {
   position: relative;
   isolation: isolate;
   min-height: 78vh;
+  padding-inline: clamp(1rem, 4vw, 4.5rem);
   padding-top: 2rem;
   padding-bottom: 4rem;
 }
@@ -2247,7 +2251,7 @@ h1 {
   position: relative;
   width: 100%;
   margin: 0;
-  padding: 2.6rem clamp(1rem, 4vw, 4.5rem);
+  padding: 2.6rem var(--page-gutter);
   border-top: 1px solid;
   border-image: linear-gradient(
       90deg,
@@ -2265,7 +2269,7 @@ h1 {
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   align-items: center;
   gap: clamp(1.4rem, 5vw, 4rem);
-  max-width: 1216px;
+  max-width: var(--content-max);
   margin: 0 auto;
 }
 
@@ -2317,6 +2321,111 @@ h1 {
 .footer-social svg {
   width: 1.15rem;
   height: 1.15rem;
+}
+
+@media (min-width: 2560px) {
+  :root {
+    --page-gutter: 6.5rem;
+    --wide-gutter: 7rem;
+    --content-max: 1500px;
+  }
+
+  .site-header {
+    padding-inline: var(--page-gutter);
+  }
+
+  .hero {
+    min-height: 88vh;
+    grid-template-columns: minmax(34rem, 0.72fr) minmax(54rem, 1.28fr);
+    gap: 4.5rem;
+    padding: 8rem var(--page-gutter) 7rem var(--wide-gutter);
+  }
+
+  .hero-content {
+    margin-left: 0;
+    padding-top: 6rem;
+  }
+
+  .hero-model-panel {
+    min-height: min(72rem, 74vh);
+  }
+
+  .hero-model-stage {
+    min-height: min(68rem, 70vh);
+  }
+
+  .hero-model-mount {
+    inset: -24% -28% -16% -18%;
+  }
+
+  .featured {
+    grid-template-columns: minmax(0, 1fr) minmax(32rem, 0.58fr);
+    gap: 4rem;
+    min-height: 30rem;
+  }
+
+  .store-layout {
+    grid-template-columns: 280px minmax(0, 1fr);
+    gap: 2rem;
+  }
+
+  .discord-chat {
+    max-width: 420px;
+    height: min(56vh, 620px);
+    max-height: 620px;
+  }
+}
+
+@media (min-width: 3840px) {
+  :root {
+    --page-gutter: 9rem;
+    --wide-gutter: 10rem;
+    --content-max: 1880px;
+  }
+
+  .hero {
+    min-height: 90vh;
+    grid-template-columns: minmax(38rem, 0.68fr) minmax(72rem, 1.32fr);
+    gap: 6rem;
+    padding-top: 9rem;
+    padding-bottom: 8rem;
+  }
+
+  .hero-content {
+    padding-top: 8rem;
+  }
+
+  .hero-model-panel {
+    min-height: min(86rem, 78vh);
+  }
+
+  .hero-model-stage {
+    min-height: min(82rem, 74vh);
+  }
+
+  .hero-model-mount {
+    inset: -28% -32% -18% -20%;
+  }
+
+  .featured,
+  .stock-section,
+  .trust-band,
+  .discord-section,
+  .store-page,
+  .status-page,
+  .checkout-page {
+    padding-inline: var(--wide-gutter);
+  }
+
+  .stock-section,
+  .store-page {
+    padding-block: 6.5rem;
+  }
+
+  .featured {
+    min-height: 34rem;
+  }
+
 }
 
 @media (max-width: 1050px) {

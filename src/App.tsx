@@ -541,7 +541,8 @@ function HeroModelViewer({
       const size = box.getSize(new THREE.Vector3());
       const center = box.getCenter(new THREE.Vector3());
       const maxAxis = Math.max(size.x, size.y, size.z) || 1;
-      const scale = 2.45 / maxAxis;
+      const wideScreen = window.matchMedia("(min-width: 2560px)").matches;
+      const scale = (wideScreen ? 3.15 : 2.5) / maxAxis;
 
       object.position.sub(center);
       object.scale.setScalar(scale);
@@ -575,7 +576,7 @@ function HeroModelViewer({
         });
 
         fitModel(model);
-        pivot.position.y = -0.8;
+        pivot.position.y = window.matchMedia("(min-width: 2560px)").matches ? -0.7 : -0.8;
         pivot.rotation.y = spinRef.current;
         pivot.add(model);
         modelRef.current = pivot;
@@ -676,7 +677,7 @@ function HomePage({
         <div>
           <p className="eyebrow">Secure & Up to date</p>
           <h2 id="featured-title">Always under the radar.</h2>
-          <p>{featuredProduct ? stripHtml(featuredProduct.description) : "Loading live product details."}</p>
+          <p>never detected, premium cheats selected.</p>
         </div>
         <RadarPanel />
       </section>
@@ -711,17 +712,17 @@ function HomePage({
           <div>
             <span>01</span>
             <h3>Pick a key</h3>
-            <p>Stock, price, and variants can be pulled directly from SellAuth.</p>
+            <p>Choose from our variety of game cheats from Rust, Apex legends, EFT, and even Roblox executors.</p>
           </div>
           <div>
             <span>02</span>
             <h3>Checkout</h3>
-            <p>Use SellAuth invoices, coupons, and payment methods from the server.</p>
+            <p>Our automated checkout system allows you to get your key and into the game instantly!</p>
           </div>
           <div>
             <span>03</span>
             <h3>Deliver</h3>
-            <p>Serials and service fulfilment stay inside the SellAuth workflow.</p>
+            <p>Serials are automatically delivered to your email, you'll instantly be in game!</p>
           </div>
         </div>
       </section>
@@ -924,7 +925,7 @@ function StorePage({
     <section className="store-page">
       <SilkShader className="store-bloodline" />
       <div className="store-heading">
-        <h1>Choose your next key.</h1>
+        <h1>Select your next cheat!</h1>
         <p>{error || "Browse our selection of the best game cheats on the market."}</p>
       </div>
 
