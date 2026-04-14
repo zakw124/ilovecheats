@@ -46,6 +46,22 @@ function getProductGroup(product: StoreProduct) {
   return product.group_name || product.category || "Keys";
 }
 
+function isFeaturedGroup(group: string) {
+  return group.trim().toLowerCase() === "featured";
+}
+
+function compareStoreGroups(first: string, second: string) {
+  if (isFeaturedGroup(first) && !isFeaturedGroup(second)) {
+    return -1;
+  }
+
+  if (!isFeaturedGroup(first) && isFeaturedGroup(second)) {
+    return 1;
+  }
+
+  return 0;
+}
+
 function slugify(value: string) {
   return value
     .toLowerCase()
@@ -915,7 +931,9 @@ function StorePage({
     );
   }
 
-  const categories = Array.from(new Set(products.map((item) => getProductGroup(item))));
+  const categories = Array.from(new Set(products.map((item) => getProductGroup(item)))).sort(
+    compareStoreGroups
+  );
   const productsByCategory = categories.map((category) => ({
     category,
     products: products.filter((product) => getProductGroup(product) === category)
