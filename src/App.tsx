@@ -15,19 +15,13 @@ import {
   fetchProducts,
   getProductImage
 } from "./api";
-import type { DiscordChatMessage, InitialAppData, Product, ProductVariant } from "./types";
-
-type ProductFeature = {
-  group: string;
-  items: string[];
-};
+import type { DiscordChatMessage, InitialAppData, Product } from "./types";
 
 type StoreProduct = Product & {
   category?: string;
   gallery?: string[];
   platform?: string;
   detected?: boolean;
-  features?: ProductFeature[];
 };
 
 function getProductGroup(product: StoreProduct) {
@@ -117,17 +111,6 @@ const loadingProduct: StoreProduct = {
   stock: 0,
   variants: [{ id: "loading", name: "Loading", price: 0, stock: 0 }]
 };
-
-const defaultFeatures: ProductFeature[] = [
-  {
-    group: "Details",
-    items: ["Loading product details."]
-  },
-  {
-    group: "Support",
-    items: ["Loading support details."]
-  }
-];
 
 function currency(value?: number | string, code = "USD") {
   const amount = Number(value || 0);
@@ -282,37 +265,14 @@ function htmlToLines(value?: string) {
     .filter(Boolean);
 }
 
-function getDescriptionTabs(
-  product: StoreProduct,
-  selected?: ProductVariant
-) {
-  const description = htmlToLines(product.description || product.meta_description);
-  const instructions = htmlToLines(
-    product.instructions || selected?.instructions || selected?.description
-  );
-  const apiTabs = [...(product.product_tabs || [])]
+function getDescriptionTabs(product: StoreProduct) {
+  return [...(product.product_tabs || [])]
     .sort((left, right) => Number(left.order ?? 0) - Number(right.order ?? 0))
     .map((tab) => ({
       group: tab.title || "Details",
       items: htmlToLines(tab.content)
     }))
     .filter((tab) => tab.items.length > 0);
-
-  if (description.length > 0 || instructions.length > 0 || apiTabs.length > 0) {
-    return [
-      {
-        group: "Includes",
-        items: description.length > 0 ? description : defaultFeatures[0].items
-      },
-      ...apiTabs,
-      {
-        group: "Support",
-        items: instructions.length > 0 ? instructions : defaultFeatures[1].items
-      }
-    ];
-  }
-
-  return product.features || defaultFeatures;
 }
 
 function normalizeProducts(items: Product[]) {
@@ -1013,7 +973,7 @@ function ProductPage({
   const [activeFeatureTab, setActiveFeatureTab] = useState("Includes");
   const selected =
     variants.find((variant) => String(variant.id) === String(selectedVariant)) || firstAvailable;
-  const descriptionTabs = getDescriptionTabs(product, selected);
+  const descriptionTabs = getDescriptionTabs(product);
   const activeDescriptionTab =
     descriptionTabs.find((tab) => tab.group === activeFeatureTab) || descriptionTabs[0];
   const productStatus = getProductStatus(product);
@@ -1112,27 +1072,29 @@ function ProductPage({
               : null}
           </div>
 
-          <div className="feature-box">
-            <div className="feature-tabs">
-              {descriptionTabs.map((feature) => (
-                <button
-                  className={
-                    activeDescriptionTab?.group === feature.group ? "active" : ""
-                  }
-                  type="button"
-                  onClick={() => setActiveFeatureTab(feature.group)}
-                  key={feature.group}
-                >
-                  {feature.group}
-                </button>
-              ))}
+          {descriptionTabs.length > 0 ? (
+            <div className="feature-box">
+              <div className="feature-tabs">
+                {descriptionTabs.map((feature) => (
+                  <button
+                    className={
+                      activeDescriptionTab?.group === feature.group ? "active" : ""
+                    }
+                    type="button"
+                    onClick={() => setActiveFeatureTab(feature.group)}
+                    key={feature.group}
+                  >
+                    {feature.group}
+                  </button>
+                ))}
+              </div>
+              <ul>
+                {(activeDescriptionTab?.items || []).map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
             </div>
-            <ul>
-              {(activeDescriptionTab?.items || []).map((item) => (
-                <li key={item}>{item}</li>
-              ))}
-            </ul>
-          </div>
+          ) : null}
         </div>
 
         <div className="purchase-panel">
