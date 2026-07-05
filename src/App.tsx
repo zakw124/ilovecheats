@@ -4,7 +4,7 @@ import SilkShader from "@/components/ui/bloodline";
 import { Footer } from "@/components/ui/footer-section";
 import { RadarPanel } from "@/components/ui/radar-effect";
 import { RippleEffect } from "@/components/ui/ripple-effect-creator";
-import { Lightbulb, MessageCircle, X } from "lucide-react";
+import { Check, CreditCard, KeyRound, Lightbulb, MessageCircle, X, Zap } from "lucide-react";
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import {
@@ -101,6 +101,150 @@ const heroModels = [
     path: "/models/AK47.glb"
   }
 ];
+
+const tickerItems = [
+  "Undetected game cheats",
+  "Instant product key delivery",
+  "Card and crypto ready",
+  "24/7 human support"
+];
+
+const tickerLoopItems = Array.from({ length: 6 }, () => tickerItems).flat();
+
+const heroTaglines = [
+  "Whats stopping you?",
+  "Prefer computer aim do you?",
+  "Batteries not included",
+  "A cheaters paradise",
+  "Promised 3000 years ago",
+  "Cheaper than cocaine",
+  "Wasson my shag?",
+  "Frying dopamine receptors since 2023",
+  "What colour is your Rust Cheat?",
+  "Who needs to aim anyway?",
+  "Funded by the silkroad since 2012",
+  "CIA doing backflips rn",
+  "Larping being legit since 2023",
+  "I know you want me",
+  "Coded in a sweatshop",
+  "Smoking legits since 2023",
+  "Epstein island for cheaters",
+  "Swap BTC for DTC?",
+  "Mentioned 13 times in the bible",
+  "Feels like 30k volts",
+  "Ripping darts n ripping heads",
+  "My favorite addiction",
+  "It's like chewing on a live wire",
+  "It's like clipping through reality",
+  "Anyone here got a lighter?",
+  "All cheats catered for you!" ,
+  "Money comes back, cheating with the boys doesn't" , 
+  "Like a 12 guage to the dome!" , 
+  "H-H-Headshot, ULTRA KILL" , 
+  "We bottled Exstacy and put it in software" , 
+  "Smoking calculator pack daily" ,
+  "Reversing anti-cheats since Nam" , 
+  "You'll need DMT to sober up after this!" , 
+  "I've never seen god and ilovecheats.com in the same room" ,
+  "Recommended by 7/10 doctors" , 
+  "There is no evidence that cheating and liver failure are related..." , 
+  "CIA.GOV doesn't recommend the use of 3rd party software in computer games" ,
+  "Shut up MOOOOOOM im on my 32nd gap year",
+  "just like crack in the 80s" , 
+  "Owned by fuckbitches n get money incorporated" ,
+  "Im literally full clean I swear!" , 
+  "Illegal in 53 member states" , 
+  "Developing IRL ESP to find bitches for your broke ass" , 
+  "We also sell peptides!" ,
+  "Anyone here blasting tren also?" ,
+  "Thomas shelby messaged me, He wants to use my likeness for another season", 
+  "My dad's belly is bigger than your dads" , 
+  "LOLLL SEGMENTATION FAULT" ,
+  "Recycling Voyager paste since 2014" ,
+  "Pasting indigo since the year 2000" , 
+  "I Counter-Strike my girlfriend" , 
+  "Reversing packets to sniff" , 
+  "I've never seen ilovecheats and calvicular in the same room" , 
+  "I also run Unbanned.net", 
+  "I've gooned my last goon" , 
+  "GG EZ, UD 2020" , 
+  "My hamster mogs yours" , 
+  "i've got punkbuster emulated 1:1 kid",
+  "Hydra's worst nightmare",
+  "SneedMapper powered" , 
+  "Golden goose bypass since 2019" , 
+  "I'll think of more of these later, going out rn",
+  "LIFEEEEHAAAACK BITCH!!! (◣_◢)",
+  "(◣_◢) 𝕚 𝕕𝕠𝕟𝕥 𝕔𝕒𝕣𝕖 𝕗𝕠𝕣 𝕤𝕞𝕠𝕜𝕖, 𝕚 𝕒𝕞 𝕟𝕠𝕥 𝕞𝕒𝕚𝕟. (◣_◢)" , 
+  "𝓟𝓪𝓼𝓽𝓮 𝓸𝓻 𝓰𝓮𝓽 𝓟𝓪𝓼𝓽𝓮𝓭 . . ." ,
+  "𝕡𝕦𝕥𝕚𝕟 𝕙𝕚𝕣𝕖 𝕞𝕖 𝕗𝕠𝕣 𝕨𝕒𝕣, 𝕨𝕙𝕖𝕟 𝕟𝕒𝕥𝕠 𝕤𝕖𝕖𝕤 𝕞𝕪 𝕔𝕗𝕘, 𝕥𝕙𝕖𝕪 𝕒𝕣𝕖 𝕣𝕢𝕚𝕟𝕘." , 
+  "𝕔𝕒𝕝𝕝 𝕞𝕖 𝕧𝕝𝕒𝕕𝕞𝕚𝕣 𝕥𝕙𝕖 𝕨𝕒𝕪 𝕚𝕞 𝕡𝕦𝕥𝕚𝕟 𝕒𝕝𝕝 𝕥𝕙𝕚𝕤 𝕞𝕠𝕟𝕖𝕪 𝕚𝕟 𝕞𝕪 𝕡𝕠𝕔𝕜𝕖𝕥𝕤 ♛" , 
+  "𝕙𝕖𝕪 𝕓𝕣𝕠, 𝕪𝕠𝕦 𝕚𝕟 𝕔𝕠𝕞𝕞？ ♛" , 
+  "𝕚𝕥𝕤 𝕟𝕠𝕥 𝕗𝕣𝕒𝕦𝕕, 𝕚𝕥𝕤 𝕔𝕣𝕖𝕒𝕥𝕚𝕧𝕖 𝕒𝕔𝕔𝕠𝕦𝕟𝕥𝕚𝕟𝕘 ♕"
+
+
+
+
+
+ 
+
+   
+  
+ 
+];
+
+function pickNextIndex(list: string[], current: number) {
+  if (list.length <= 1) {
+    return current;
+  }
+
+  let next = Math.floor(Math.random() * list.length);
+
+  while (next === current) {
+    next = Math.floor(Math.random() * list.length);
+  }
+
+  return next;
+}
+
+function useTypewriter(
+  list: string[],
+  { typingSpeed = 46, deletingSpeed = 26, pauseMs = 1500 } = {}
+) {
+  const [index, setIndex] = useState(0);
+  const [text, setText] = useState("");
+  const [phase, setPhase] = useState<"typing" | "deleting">("typing");
+
+  useEffect(() => {
+    const current = list[index] || "";
+    let timeoutId: number;
+
+    if (phase === "typing") {
+      if (text.length < current.length) {
+        timeoutId = window.setTimeout(() => {
+          setText(current.slice(0, text.length + 1));
+        }, typingSpeed);
+      } else {
+        timeoutId = window.setTimeout(() => setPhase("deleting"), pauseMs);
+      }
+    } else {
+      if (text.length > 0) {
+        timeoutId = window.setTimeout(() => {
+          setText(current.slice(0, text.length - 1));
+        }, deletingSpeed);
+      } else {
+        timeoutId = window.setTimeout(() => {
+          setIndex((prevIndex) => pickNextIndex(list, prevIndex));
+          setPhase("typing");
+        }, 260);
+      }
+    }
+
+    return () => window.clearTimeout(timeoutId);
+  }, [text, phase, index, list, typingSpeed, deletingSpeed, pauseMs]);
+
+  return text;
+}
 
 const loadingProduct: StoreProduct = {
   id: "loading",
@@ -220,7 +364,7 @@ async function openSellAuthCheckout(
 }
 
 function stripHtml(value?: string) {
-  return value ? value.replace(/<[^>]+>/g, "").trim() : "";
+  return value ? decodeHtml(value.replace(/<[^>]+>/g, "")).trim() : "";
 }
 
 function truncateText(value: string, maxLength = 120) {
@@ -311,26 +455,41 @@ function getPathProductId() {
   return decodeURIComponent(id || "");
 }
 
-function Header() {
+const navLinks = [
+  { href: "/", label: "Home", match: "home" },
+  { href: "/store", label: "Store", match: "store" },
+  { href: "/status", label: "Status", match: "status" }
+];
+
+function Header({ route }: { route: string }) {
   return (
     <header className="site-header">
-      <a className="brand" href="/">
-        <img className="brand-mark" src="/images/brand-icon.png" alt="" />
-        <span>ilovecheats.com</span>
-      </a>
-      <nav aria-label="Primary navigation">
-        <a href="/">Home</a>
-        <a href="/store">Store</a>
-        <a href="/status">Status</a>
-        <a href={discordInviteUrl} target="_blank" rel="noreferrer">
-          Discord
+      <div className="site-header-inner">
+        <a className="brand" href="/">
+          <img className="brand-mark" src="/images/brand-icon.png" alt="" />
+          <span>ilovecheats.com</span>
         </a>
-      </nav>
-      <RippleEffect rippleColor="rgba(255, 255, 255, 0.34)">
-        <a className="store-pill" href="/store">
-          Store
-        </a>
-      </RippleEffect>
+        <nav aria-label="Primary navigation">
+          {navLinks.map((link) => (
+            <a
+              className={route === link.match ? "active" : ""}
+              href={link.href}
+              aria-current={route === link.match ? "page" : undefined}
+              key={link.href}
+            >
+              {link.label}
+            </a>
+          ))}
+          <a href={discordInviteUrl} target="_blank" rel="noreferrer">
+            Discord
+          </a>
+        </nav>
+        <RippleEffect rippleColor="rgba(255, 255, 255, 0.34)">
+          <a className="store-pill" href="/store">
+            Store
+          </a>
+        </RippleEffect>
+      </div>
     </header>
   );
 }
@@ -348,33 +507,33 @@ function ProductCard({
     truncateText(stripHtml(product.description), 100) || "Product details update at checkout.";
 
   return (
-    <article className="product-card">
-      <span className="product-status-badge" style={{ color: status.color }}>
-        {status.text}
-      </span>
-      <a href={`/product/${product.id}`} aria-label={`View ${product.name}`}>
+    <RippleEffect rippleColor="rgba(255, 82, 119, 0.3)">
+      <a
+        className="product-card"
+        href={`/product/${product.id}`}
+        aria-label={`View ${product.name}`}
+      >
+        <span className="product-status-badge" style={{ color: status.color }}>
+          {status.text}
+        </span>
         {getProductImage(product, index) ? (
           <img src={getProductImage(product, index)} alt="" />
         ) : (
           <div className="product-image-loading">Loading image</div>
         )}
-      </a>
-      <div className="product-body">
-        <h3>
-          <a href={`/product/${product.id}`}>{product.name}</a>
-        </h3>
-        <p>{description}</p>
-        <div className="product-footer">
-          <strong>
-            <span>Starting from</span>
-            {currency(startingPrice, product.currency)}
-          </strong>
-          <RippleEffect rippleColor="rgba(255, 255, 255, 0.34)">
-            <a className="rainbow-button" href={`/product/${product.id}`}>View</a>
-          </RippleEffect>
+        <div className="product-body">
+          <h3>{product.name}</h3>
+          <p>{description}</p>
+          <div className="product-footer">
+            <strong>
+              <span>Starting from</span>
+              {currency(startingPrice, product.currency)}
+            </strong>
+            <span className="product-view-cta">View</span>
+          </div>
         </div>
-      </div>
-    </article>
+      </a>
+    </RippleEffect>
   );
 }
 
@@ -518,7 +677,7 @@ function HeroModelViewer({
       const center = box.getCenter(new THREE.Vector3());
       const maxAxis = Math.max(size.x, size.y, size.z) || 1;
       const wideScreen = window.matchMedia("(min-width: 2560px)").matches;
-      const scale = (wideScreen ? 3.15 : 2.5) / maxAxis;
+      const scale = (wideScreen ? 2.75 : 2.2) / maxAxis;
 
       object.position.sub(center);
       object.scale.setScalar(scale);
@@ -579,93 +738,99 @@ function HeroModelViewer({
 
 function HomePage({
   products,
-  isLive,
   error
 }: {
   products: StoreProduct[];
-  isLive: boolean;
   error: string;
 }) {
-  const featuredProduct = products[0];
   const [selectedModelId, setSelectedModelId] = useState("ak47-sheen");
   const selectedModel =
     heroModels.find((model) => model.id === selectedModelId) || heroModels[0];
+  const typedTagline = useTypewriter(heroTaglines);
 
   return (
     <>
       <section className="hero">
         <SilkShader className="hero-bloodline" />
         <div className="hero-shade" />
-        <div className="hero-content">
-          <p className="eyebrow">Instant delivery. 24/7 support</p>
-          <h1>A cheaters wet-dream</h1>
-          <p className="hero-copy">
-            undetected products made simple.
-          </p>
-          <div className="hero-actions">
-            <RippleEffect rippleColor="rgba(255, 255, 255, 0.34)">
-              <a className="primary-button rainbow-button" href="/store">
-                View Store
-              </a>
-            </RippleEffect>
-            <RippleEffect rippleColor="rgba(255, 255, 255, 0.3)">
-              <a
-                className="secondary-button"
-                href={discordInviteUrl}
-                target="_blank"
-                rel="noreferrer"
-              >
-                Join Discord
-              </a>
-            </RippleEffect>
-            <RippleEffect rippleColor="rgba(255, 82, 119, 0.34)">
-              <button
-                className="model-toggle"
-                type="button"
-                onClick={() =>
-                  setSelectedModelId((current) =>
-                    current === "ak47-sheen" ? "ak47" : "ak47-sheen"
-                  )
-                }
-                aria-label="Toggle chams model"
-              >
-                <Lightbulb aria-hidden="true" />
-              </button>
-            </RippleEffect>
+        <div className="hero-inner">
+          <div className="hero-content">
+            <h1 className="hero-headline">A Cheaters Wet-Dream</h1>
+            <p className="hero-copy">
+              <span className="typewriter-text">{typedTagline}</span>
+              <span className="typewriter-caret" aria-hidden="true" />
+            </p>
+            <div className="hero-actions">
+              <RippleEffect rippleColor="rgba(255, 255, 255, 0.34)">
+                <a className="primary-button" href="/store">
+                  View Store
+                </a>
+              </RippleEffect>
+              <RippleEffect rippleColor="rgba(255, 255, 255, 0.3)">
+                <a
+                  className="secondary-button"
+                  href={discordInviteUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Join Discord
+                </a>
+              </RippleEffect>
+              <RippleEffect rippleColor="rgba(255, 82, 119, 0.34)">
+                <button
+                  className="model-toggle"
+                  type="button"
+                  onClick={() =>
+                    setSelectedModelId((current) =>
+                      current === "ak47-sheen" ? "ak47" : "ak47-sheen"
+                    )
+                  }
+                  aria-label="Toggle chams model"
+                >
+                  <Lightbulb aria-hidden="true" />
+                </button>
+              </RippleEffect>
+            </div>
           </div>
-        </div>
-        <div className="hero-model-panel">
-          <HeroModelViewer
-            modelPath={selectedModel.path}
-            modelName={selectedModel.name}
-          />
+          <div className="hero-model-panel">
+            <HeroModelViewer
+              modelPath={selectedModel.path}
+              modelName={selectedModel.name}
+            />
+          </div>
         </div>
       </section>
 
       <section className="ticker" aria-label="Store highlights">
-        <span>{isLive ? "Undetected game cheats" : "Undetected game cheats"}</span>
-        <span>Instant product key delivery</span>
-        <span>Card and crypto ready</span>
-        <span>24/7 Human Support</span>
+        <div className="ticker-track">
+          <ul className="ticker-list">
+            {tickerLoopItems.map((item, index) => (
+              <li key={`${item}-${index}`}>{item}</li>
+            ))}
+          </ul>
+          <ul className="ticker-list" aria-hidden="true">
+            {tickerLoopItems.map((item, index) => (
+              <li key={`${item}-${index}`}>{item}</li>
+            ))}
+          </ul>
+        </div>
       </section>
 
       <section className="featured" aria-labelledby="featured-title">
-        <div>
-          <p className="eyebrow">Secure & Up to date</p>
-          <h2 id="featured-title">Always under the radar.</h2>
-          <p>never detected, premium cheats selected.</p>
+        <div className="featured-inner">
+          <div className="featured-copy">
+            <p className="eyebrow">Secure &amp; up to date</p>
+            <h2 id="featured-title">Always under the radar.</h2>
+            <p>Never detected, premium cheats selected.</p>
+          </div>
+          <RadarPanel />
         </div>
-        <RadarPanel />
       </section>
 
       <section className="stock-section" id="stock" aria-labelledby="stock-title">
         <div className="section-heading">
-          <p className="eyebrow">Current Stock</p>
           <h2 id="stock-title">Keys people are grabbing right now</h2>
-          <p>
-            {error ||
-              "See what the competition are using and beat them!"}
-          </p>
+          {error ? <p>{error}</p> : null}
         </div>
 
         <div className="product-grid">
@@ -680,26 +845,34 @@ function HomePage({
       </section>
 
       <section className="trust-band" id="trust" aria-labelledby="trust-title">
-        <div>
-          <p className="eyebrow">Delivery Flow</p>
-          <h2 id="trust-title">Paid, fulfilled, and ready to activate.</h2>
-        </div>
-        <div className="trust-grid">
-          <div>
-            <span>01</span>
-            <h3>Pick a key</h3>
-            <p>Choose from our variety of game cheats from Rust, Apex legends, EFT, and even Roblox executors.</p>
+        <div className="trust-band-inner">
+          <div className="trust-heading">
+            <p className="eyebrow">Delivery Flow</p>
+            <h2 id="trust-title">Paid, fulfilled, and ready to activate.</h2>
           </div>
-          <div>
-            <span>02</span>
-            <h3>Checkout</h3>
-            <p>Our automated checkout system allows you to get your key and into the game instantly!</p>
-          </div>
-          <div>
-            <span>03</span>
-            <h3>Deliver</h3>
-            <p>Serials are automatically delivered to your email, you'll instantly be in game!</p>
-          </div>
+          <ol className="trust-flow">
+            <li>
+              <div className="trust-node">
+                <KeyRound aria-hidden="true" />
+              </div>
+              <h3>Pick a key</h3>
+              <p>Choose from our variety of game cheats from Rust, Apex Legends, EFT, and even Roblox executors.</p>
+            </li>
+            <li>
+              <div className="trust-node">
+                <CreditCard aria-hidden="true" />
+              </div>
+              <h3>Checkout</h3>
+              <p>Our automated checkout system gets your key paid, processed, and ready in seconds.</p>
+            </li>
+            <li>
+              <div className="trust-node">
+                <Zap aria-hidden="true" />
+              </div>
+              <h3>Deliver</h3>
+              <p>Serials land straight in your inbox &mdash; you'll be back in game instantly.</p>
+            </li>
+          </ol>
         </div>
       </section>
 
@@ -820,10 +993,22 @@ function DiscordSection() {
             Get support, share configs, and stay updated.
           </p>
           <ul>
-            <li>24/7 instant support from staff and community</li>
-            <li>First to know about updates and new features</li>
-            <li>Share configs, tips, and strategies</li>
-            <li>Exclusive giveaways and promotions</li>
+            <li>
+              <Check aria-hidden="true" />
+              24/7 instant support from staff and community
+            </li>
+            <li>
+              <Check aria-hidden="true" />
+              First to know about updates and new features
+            </li>
+            <li>
+              <Check aria-hidden="true" />
+              Share configs, tips, and strategies
+            </li>
+            <li>
+              <Check aria-hidden="true" />
+              Exclusive giveaways and promotions
+            </li>
           </ul>
           <a className="discord-button" href={discordInviteUrl} target="_blank" rel="noreferrer">
             <span className="discord-icon" aria-hidden="true" />
@@ -903,6 +1088,7 @@ function StorePage({
     <section className="store-page">
       <SilkShader className="store-bloodline" />
       <div className="store-heading">
+        <p className="eyebrow">Full Catalog</p>
         <h1>Select your next cheat!</h1>
         <p>{error || "Browse our selection of the best game cheats on the market."}</p>
       </div>
@@ -914,6 +1100,7 @@ function StorePage({
             <RippleEffect rippleColor="rgba(255, 82, 119, 0.24)" key={category}>
               <a href={`#${slugify(category)}`}>
                 {category}
+                <small>{productsByCategory.find((group) => group.category === category)?.products.length ?? 0}</small>
               </a>
             </RippleEffect>
           ))}
@@ -927,7 +1114,12 @@ function StorePage({
               key={group.category}
             >
               <div className="category-heading">
-                <h2>{group.category}</h2>
+                <h2>
+                  {group.category}
+                  {isFeaturedGroup(group.category) ? (
+                    <span className="category-featured-badge">Staff picks</span>
+                  ) : null}
+                </h2>
                 <span>{group.products.length} products</span>
               </div>
               <div className="store-products">
@@ -1554,7 +1746,7 @@ export default function App({
 
   return (
     <main>
-      <Header />
+      <Header route={route} />
       {route === "store" ? (
         <StorePage products={products} error={error} />
       ) : route === "status" ? (
@@ -1575,7 +1767,7 @@ export default function App({
           checkoutId={checkoutId}
         />
       ) : (
-        <HomePage products={products} isLive={isLive} error={error} />
+        <HomePage products={products} error={error} />
       )}
       <Footer />
       <FloatingDiscordWidget />
