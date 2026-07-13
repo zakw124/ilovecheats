@@ -367,14 +367,6 @@ function stripHtml(value?: string) {
   return value ? decodeHtml(value.replace(/<[^>]+>/g, "")).trim() : "";
 }
 
-function truncateText(value: string, maxLength = 120) {
-  if (value.length <= maxLength) {
-    return value;
-  }
-
-  return `${value.slice(0, maxLength).trimEnd()}...`;
-}
-
 function decodeHtml(value: string) {
   if (typeof document === "undefined") {
     return value
@@ -503,8 +495,6 @@ function ProductCard({
 }) {
   const status = getProductStatus(product);
   const startingPrice = getStartingPrice(product);
-  const description =
-    truncateText(stripHtml(product.description), 100) || "Product details update at checkout.";
 
   return (
     <RippleEffect rippleColor="rgba(255, 82, 119, 0.3)">
@@ -516,17 +506,18 @@ function ProductCard({
         <span className="product-status-badge" style={{ color: status.color }}>
           {status.text}
         </span>
-        {getProductImage(product, index) ? (
-          <img src={getProductImage(product, index)} alt="" />
-        ) : (
-          <div className="product-image-loading">Loading image</div>
-        )}
+        <div className="product-image-frame">
+          {getProductImage(product, index) ? (
+            <img src={getProductImage(product, index)} alt="" />
+          ) : (
+            <div className="product-image-loading">Loading image</div>
+          )}
+        </div>
         <div className="product-body">
           <h3>{product.name}</h3>
-          <p>{description}</p>
           <div className="product-footer">
             <strong>
-              <span>Starting from</span>
+              <span>From</span>
               {currency(startingPrice, product.currency)}
             </strong>
             <span className="product-view-cta">View</span>
@@ -1088,9 +1079,9 @@ function StorePage({
     <section className="store-page">
       <SilkShader className="store-bloodline" />
       <div className="store-heading">
-        <p className="eyebrow">Full Catalog</p>
-        <h1>Select your next cheat!</h1>
-        <p>{error || "Browse our selection of the best game cheats on the market."}</p>
+        
+        <h1>Instant Delivery, Guarunteed.</h1>
+        <p>{error || "Choose your weapon, Browse our selection of undetected cheats"}</p>
       </div>
 
       <div className="store-layout">

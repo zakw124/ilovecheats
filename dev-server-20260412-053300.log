@@ -27,3 +27,9 @@
 [dev:client] [2m05:49:23[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/App.tsx[22m
 [dev:client] [2m05:49:32[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/App.tsx[22m
 [dev:client] [2m05:49:39[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/App.tsx[22m
+[dev:server] ^C
+[dev:client] ^C
+[dev:server] ^CTerminate batch job (Y/N)? 
+[dev:client] ^CTerminate batch job (Y/N)? 
+[dev:server] npm run dev:server exited with code 3221225786
+[dev:client] npm run dev:client exited with code 3221225786
