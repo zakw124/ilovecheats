@@ -203,7 +203,17 @@ img {
   display: block;
   width: 100%;
   height: 100%;
-  background: #050507;
+  background: #000000;
+  filter: blur(0.5px) saturate(500%);
+}
+
+.bloodline-background::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: rgba(8, 8, 10, 0.1);
+  pointer-events: none;
 }
 
 .site-header {
@@ -418,15 +428,6 @@ nav a.active::after {
   height: 100%;
   overflow: visible;
   border-radius: var(--radius-lg);
-}
-
-.hero-model-glow {
-  position: absolute;
-  inset: 12% 4% 8%;
-  border-radius: 999px;
-  background:
-    radial-gradient(circle, rgba(255, 82, 119, 0.3), rgba(255, 82, 119, 0.08) 38%, transparent 68%);
-  filter: blur(18px);
 }
 
 .hero-model-mount {
@@ -1666,12 +1667,21 @@ h1 {
 }
 
 .product-breadcrumbs a {
+  display: inline-flex;
+  align-items: center;
+  line-height: 1;
+  padding-bottom: 0;
   color: var(--accent);
   font-weight: 800;
+  outline: none;
+}
+
+.product-breadcrumbs a::after {
+  content: none;
 }
 
 .product-breadcrumbs a:hover {
-  color: #fff;
+  color: var(--accent);
 }
 
 .product-breadcrumbs strong {
@@ -2457,69 +2467,59 @@ h1 {
   position: relative;
   width: 100%;
   margin: 0;
-  padding: 3.4rem var(--page-gutter) 2.6rem;
+  padding: 2.6rem var(--page-gutter);
   border-top: 1px solid var(--line);
   background: rgba(8, 8, 10, 0.94);
 }
 
 .footer-inner {
   max-width: var(--page-max);
-  display: grid;
-  grid-template-columns: minmax(0, 1.3fr) minmax(0, 0.8fr) minmax(0, 1.1fr);
-  align-items: start;
-  gap: clamp(1.6rem, 5vw, 4rem);
   width: 100%;
   margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+  animation: soft-rise 520ms ease both;
 }
 
-.footer-brand {
-  display: grid;
-  gap: 0.9rem;
-  animation: soft-rise 520ms ease both;
+.footer-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
 }
 
 .footer-brand-mark {
   display: inline-flex;
   align-items: center;
-  gap: 0.65rem;
+  gap: 0.6rem;
   width: fit-content;
   color: #fff;
   font-weight: 850;
 }
 
-.footer-brand p {
-  max-width: 26rem;
-  color: var(--muted);
-  font-size: 0.92rem;
-  line-height: 1.6;
-}
-
 .footer-logo {
-  width: 2.2rem;
-  height: 2.2rem;
+  width: 2rem;
+  height: 2rem;
   object-fit: contain;
   filter: drop-shadow(0 0 18px rgba(255, 82, 119, 0.32));
 }
 
 .footer-links {
-  display: grid;
-  gap: 0.75rem;
-  animation: soft-rise 520ms ease 60ms both;
-}
-
-.footer-links span {
-  margin-bottom: 0.15rem;
-  color: var(--accent);
-  font-size: 0.76rem;
-  font-weight: 900;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1.75rem;
 }
 
 .footer-links a {
-  width: fit-content;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
   color: #d7d1d9;
   font-weight: 650;
+  font-size: 0.92rem;
   transition: color 180ms ease;
 }
 
@@ -2527,36 +2527,20 @@ h1 {
   color: #fff;
 }
 
-.footer-meta {
-  display: grid;
-  justify-items: end;
-  gap: 0.75rem;
-  color: var(--muted);
-  font-size: 0.84rem;
-  text-align: right;
-  animation: soft-rise 520ms ease 100ms both;
+.footer-links svg {
+  width: 1.05rem;
+  height: 1.05rem;
 }
 
-.footer-social {
+.footer-bottom {
   display: flex;
-  align-items: center;
-  gap: 0.9rem;
-}
-
-.footer-social a {
-  transition:
-    color 180ms ease,
-    transform 180ms ease;
-}
-
-.footer-social a:hover {
-  color: #fff;
-  transform: translateY(-2px);
-}
-
-.footer-social svg {
-  width: 1.15rem;
-  height: 1.15rem;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.5rem 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 0.82rem;
 }
 
 @media (min-width: 2560px) {
@@ -2672,22 +2656,10 @@ h1 {
 }
 
 @media (max-width: 1050px) {
-  .footer-inner {
-    grid-template-columns: 1fr;
-    justify-items: center;
+  .footer-top,
+  .footer-bottom {
+    justify-content: center;
     text-align: center;
-  }
-
-  .footer-brand,
-  .footer-links,
-  .footer-meta {
-    justify-self: center;
-    justify-items: center;
-    text-align: center;
-  }
-
-  .footer-brand p {
-    max-width: 30rem;
   }
 
   .discord-panel,

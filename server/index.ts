@@ -31,6 +31,9 @@ type SellAuthProduct = {
   status_color?: string;
   description?: string;
   instructions?: string;
+  visibility?: string;
+  deleted_at?: string | null;
+  terminated_at?: string | null;
 };
 
 type SellAuthShop = {
@@ -85,6 +88,37 @@ async function getHostedProductUrl(productId: string | number) {
   }
 
   return `${shop.url.replace(/\/$/, "")}/product/${product.path}`;
+}
+
+function isPubliclyVisible(product: SellAuthProduct) {
+  if (product.deleted_at || product.terminated_at) {
+    return false;
+  }
+
+  return !product.visibility || product.visibility === "public";
+}
+
+function filterVisibleProducts(payload: unknown) {
+  if (Array.isArray(payload)) {
+    return payload.filter((product: SellAuthProduct) => isPubliclyVisible(product));
+  }
+
+  if (payload && typeof payload === "object") {
+    const record = payload as {
+      data?: SellAuthProduct[];
+      products?: SellAuthProduct[];
+    };
+
+    if (record.data) {
+      return { ...record, data: record.data.filter(isPubliclyVisible) };
+    }
+
+    if (record.products) {
+      return { ...record, products: record.products.filter(isPubliclyVisible) };
+    }
+  }
+
+  return payload;
 }
 
 function getPayloadProducts(payload: unknown) {
@@ -142,7 +176,8 @@ async function cached<T>(entry: CacheEntry<T> | undefined | null, loader: () => 
 async function getCachedProducts(query: URLSearchParams) {
   return cached(productsCache, async () => {
     const payload = await sellauthRequest(shopPath("products"), { query });
-    const value = await enrichProductStatuses(payload);
+    const enriched = await enrichProductStatuses(payload);
+    const value = filterVisibleProducts(enriched);
     productsCache = {
       value,
       expires: Date.now() + storefrontCacheMs
@@ -241,7 +276,14 @@ app.get("/api/storefront/products", async (request, response, next) => {
 
 app.get("/api/storefront/products/:productId", async (request, response, next) => {
   try {
-    response.json(await getCachedProduct(request.params.productId));
+    const product = (await getCachedProduct(request.params.productId)) as SellAuthProduct;
+
+    if (!isPubliclyVisible(product)) {
+      response.status(404).json({ error: "Product not found" });
+      return;
+    }
+
+    response.json(product);
   } catch (error) {
     next(error);
   }
@@ -249,6 +291,13 @@ app.get("/api/storefront/products/:productId", async (request, response, next) =
 
 app.get("/api/storefront/products/:productId/status", async (request, response, next) => {
   try {
+    const product = (await getCachedProduct(request.params.productId)) as SellAuthProduct;
+
+    if (!isPubliclyVisible(product)) {
+      response.status(404).json({ error: "Product not found" });
+      return;
+    }
+
     response.json(await getCachedProductStatus(request.params.productId));
   } catch (error) {
     next(error);

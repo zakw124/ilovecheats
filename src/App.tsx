@@ -663,16 +663,23 @@ function HeroModelViewer({
     }
 
     function fitModel(object: THREE.Object3D) {
-      const box = new THREE.Box3().setFromObject(object);
-      const size = box.getSize(new THREE.Vector3());
-      const center = box.getCenter(new THREE.Vector3());
-      const maxAxis = Math.max(size.x, size.y, size.z) || 1;
       const wideScreen = window.matchMedia("(min-width: 2560px)").matches;
+      const rawSize = new THREE.Box3().setFromObject(object).getSize(new THREE.Vector3());
+      const maxAxis = Math.max(rawSize.x, rawSize.y, rawSize.z) || 1;
       const scale = (wideScreen ? 2.75 : 2.2) / maxAxis;
 
-      object.position.sub(center);
       object.scale.setScalar(scale);
       object.rotation.set(0.0, -0.88, -Math.PI / 9);
+
+      // Box3 has to be recomputed after scale/rotation are applied, since
+      // position is layered on top of them (T * R * S). Centering on the
+      // pre-transform box left the pivot off the rendered mesh, so the
+      // model orbited instead of spinning around its own base.
+      const renderedBox = new THREE.Box3().setFromObject(object);
+      const baseCenter = renderedBox.getCenter(new THREE.Vector3());
+      baseCenter.y = renderedBox.min.y;
+
+      object.position.sub(baseCenter);
     }
 
     loader.load(
@@ -702,7 +709,7 @@ function HeroModelViewer({
         });
 
         fitModel(model);
-        pivot.position.y = window.matchMedia("(min-width: 2560px)").matches ? -0.7 : -0.8;
+        pivot.position.y = window.matchMedia("(min-width: 2560px)").matches ? -0.35 : -0.45;
         pivot.rotation.y = spinRef.current;
         pivot.add(model);
         modelRef.current = pivot;
@@ -721,7 +728,6 @@ function HeroModelViewer({
 
   return (
     <div className="hero-model-stage" aria-label={`${modelName} preview`}>
-      <div className="hero-model-glow" />
       <div className="hero-model-mount" ref={mountRef} />
     </div>
   );
@@ -1081,7 +1087,7 @@ function StorePage({
       <div className="store-heading">
         
         <h1>Instant Delivery, Guarunteed.</h1>
-        <p>{error || "Choose your weapon, Browse our selection of undetected cheats"}</p>
+        <p>{error || "Choose your weapon, Browse our selection of undetected cheat..."}</p>
       </div>
 
       <div className="store-layout">

@@ -182,6 +182,7 @@ export default function SilkShader({ className }: SilkShaderProps = {}) {
     const clickPos = { x: 0, y: 0 };
     let clickTime = 0;
     const startTime = Date.now();
+    const speedFactor = 0.35;
 
     const handleResize = () => {
       const dpr = window.devicePixelRatio || 1;
@@ -202,7 +203,7 @@ export default function SilkShader({ className }: SilkShaderProps = {}) {
       mouse.z = 2;
       clickPos.x = mouse.x;
       clickPos.y = mouse.y;
-      clickTime = (Date.now() - startTime) / 1000;
+      clickTime = ((Date.now() - startTime) / 1000) * speedFactor;
     };
 
     const handleMouseUp = () => {
@@ -220,7 +221,7 @@ export default function SilkShader({ className }: SilkShaderProps = {}) {
     const render = () => {
       gl.viewport(0, 0, canvas.width, canvas.height);
       gl.uniform2f(iResolutionLocation, canvas.width, canvas.height);
-      gl.uniform1f(iTimeLocation, (Date.now() - startTime) / 1000);
+      gl.uniform1f(iTimeLocation, ((Date.now() - startTime) / 1000) * speedFactor);
       gl.uniform3f(iMouseLocation, mouse.x, mouse.y, mouse.z);
       gl.uniform2f(iClickPosLocation, clickPos.x, clickPos.y);
       gl.uniform1f(iClickTimeLocation, clickTime);
